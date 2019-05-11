@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class ClientHandler implements Runnable {
                         }
                         if (flag == 1)// IF USER IS ACTIVE
                         {
+                            System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
                             ms.setSeenTime(ms.getSentTime());
                             oos=new ObjectOutputStream(receiver.getOutputStream());
