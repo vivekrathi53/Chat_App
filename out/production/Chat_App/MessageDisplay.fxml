@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox id="MessageCover" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox id="SenderDetailsBox">
+         <children>
+            <Label id="SenderName" text="From" />
+         </children>
+      </HBox>
+      <Label id="MessageContent" text="Message" />
+      <HBox id="DetailsBox">
+         <children>
+            <Label id="TimeContent" text="Time" />
+            <Label id="ReadReceipts" text="Receipts" />
+         </children>
+      </HBox>
+   </children>
+</VBox>
