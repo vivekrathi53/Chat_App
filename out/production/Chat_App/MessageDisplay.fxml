@@ -6,18 +6,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox id="MessageCover" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="MessageCover" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MessageDisplayController">
    <children>
-      <HBox id="SenderDetailsBox">
+      <HBox fx:id="SenderDetailsBox">
          <children>
-            <Label id="SenderName" text="From" />
+            <Label fx:id="SenderName" text="From" />
          </children>
       </HBox>
-      <Label id="MessageContent" text="Message" />
-      <HBox id="DetailsBox">
+      <Label fx:id="MessageContent" text="Message" />
+      <HBox fx:id="DetailsBox">
          <children>
-            <Label id="TimeContent" text="Time" />
-            <Label id="ReadReceipts" text="Receipts" />
+            <Label fx:id="TimeContent" text="Time" />
+            <Label fx:id="ReadReceipts" text="Receipts" />
          </children>
       </HBox>
    </children>

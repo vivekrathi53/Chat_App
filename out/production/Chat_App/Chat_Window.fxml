@@ -6,28 +6,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="WindowPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ChatWindowController">
+<AnchorPane fx:id="WindowPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ChatWindowController">
    <children>
-      <GridPane id="gridPane" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <GridPane fx:id="gridPane" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label prefHeight="15.0" prefWidth="90.0" text="Chats" />
-               <ScrollPane id="scrollPane" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                   <content>
-                     <FlowPane id="flowPane" prefHeight="331.0" prefWidth="513.0" />
+                     <VBox fx:id="VerticalPane" prefHeight="331.0" prefWidth="513.0" />
                   </content>
                </ScrollPane>
-              
-               <ScrollPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                  <content>
-                     <FlowPane prefHeight="331.0" prefWidth="513.0" />
-                  </content>
-               </ScrollPane>
-   
-               <VBox id="AllChats" prefHeight="373.0" prefWidth="90.0" GridPane.rowIndex="1" />
-               <HBox id="lowerHBox" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <HBox fx:id="lowerHBox" GridPane.columnIndex="1" GridPane.rowIndex="2">
                   <children>
-                     <TextArea id="textBox" prefHeight="42.0" prefWidth="435.0" promptText="Write Your Message Here" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                     <Button id="Send" mnemonicParsing="false" prefHeight="41.0" prefWidth="74.0" text="Send" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                     <TextArea fx:id="textBox" prefHeight="42.0" prefWidth="435.0" promptText="Write Your Message Here" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                     <Button fx:id="Send" mnemonicParsing="false" prefHeight="41.0" prefWidth="74.0" text="Send" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   </children>
                </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
