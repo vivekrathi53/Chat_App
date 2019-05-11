@@ -8,16 +8,20 @@ import java.util.ArrayList;
 public class Server
 {
 
+    public static ArrayList<Pair<String, Socket>> activelist;
+
     public static void main(String[] args)
     {
-        ArrayList<Pair<String, Socket>> activelist=new ArrayList<Pair<String, Socket>>();
+        activelist=new ArrayList<Pair<String, Socket>>();
+        Messagemanager msh = new Messagemanager();
+        Server server=new Server();
         try
         {
             ServerSocket ss=new ServerSocket(8999);
             while(true)
             {
                 Socket sc = ss.accept();//request is received
-                ClientHandler auth=new ClientHandler(sc,ss);
+                ClientHandler auth=new ClientHandler(sc,server,msh);
                 Thread t=new Thread(auth);
                 t.start();
                 activelist.add(new Pair<String, Socket>("", sc));
