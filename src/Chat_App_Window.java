@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Chat_App_Window extends Application {
 
@@ -21,6 +24,7 @@ public class Chat_App_Window extends Application {
     AnchorPane DisplayPane;
     ChatWindowController controller;
     ClientReciever reciever;
+    Connection connection;
     public static void main(String[] args)
     {
         launch(args);
@@ -39,15 +43,28 @@ public class Chat_App_Window extends Application {
             e.printStackTrace();
         }
         controller = loader.getController();
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
+        try {
+            connection = DriverManager.getConnection(url, "root", "password");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         reciever = new ClientReciever();
         Thread t = new Thread(reciever);
         window=primaryStage;
-        controller.socket = this.socket;
-        controller.ois = this.ois;
-        controller.oos = this.oos;
+        controller.socket = socket;
+        controller.ois = ois;
+        controller.oos = oos;
         controller.currentStage = primaryStage;
         controller.socket = socket;
-        reciever.ois=this.ois;
+        controller.connection=connection;
+        controller.refresh();
+        reciever.ois=ois;
         reciever.controller=controller;
         t.start();
         primaryStage.setTitle("Chat Window!");
