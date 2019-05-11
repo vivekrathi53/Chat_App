@@ -1,2 +1,5 @@
-public class Messagemanager {
+public class Messagemanager
+{
+    public Messagemanager() {
+    }
 }

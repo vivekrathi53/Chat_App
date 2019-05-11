@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,14 +9,16 @@ import java.sql.*;
 
 public class ClientHandler implements Runnable {
     Socket sc;
-    ServerSocket ss;
+    Server server;
     ObjectOutputStream oos;
     ObjectInputStream ois;
+    Messagemanager msh;
     String username, password;
 
-    public ClientHandler(Socket so,ServerSocket server) {
+    public ClientHandler(Socket so,Server ss,Messagemanager ms) {
         sc = so;
-        ss=server;
+        server=ss;
+        msh=ms;
     }
 
     public void run() {
@@ -33,12 +37,39 @@ public class ClientHandler implements Runnable {
             username = temp.username;
             password = temp.password;
             try {
-                if (authenticate()) {
-                    while (true)
-                    {
+                if (authenticate())
+                {
+                    while (true) {
+                        Socket receiver = null;
+                        int flag = 0;
                         ois = new ObjectInputStream(sc.getInputStream());
-                        //int index = active.indexOf("4");
-                        Messagemanager msh = new Messagemanager();
+                        obj = ois.readObject();
+                        Message ms = (Message) obj;
+                        String receirver = ms.getTo();
+                        for (Pair<String, Socket> value : server.activelist)
+                        {
+                            String check = value.getKey();
+                            if (check == receirver)
+                            {
+                                receiver = value.getValue();
+                                flag = 1;
+                                break;
+                            }
+                            System.out.print(value);
+                        }
+                        if (flag == 1)// IF USER IS ACTIVE
+                        {
+                            ms.setReceivedTime(ms.getSentTime());
+                            ms.setSeenTime(ms.getSentTime());
+                            oos=new ObjectOutputStream(receiver.getOutputStream());
+                            oos.writeObject(ms);
+                            oos.flush();
+                            oos.close();
+                        }
+                        else
+                        {
+
+                        }
                     }
                 }
                 else
