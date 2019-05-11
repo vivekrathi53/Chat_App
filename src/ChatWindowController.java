@@ -19,7 +19,7 @@ public class ChatWindowController
     @FXML
     TextArea textBox;
     @FXML
-    AnchorPane anchorPane;
+    AnchorPane WindowPane;
     @FXML
     FlowPane flowPane;
     @FXML
