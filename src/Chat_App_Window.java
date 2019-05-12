@@ -31,8 +31,17 @@ public class Chat_App_Window extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage)
-    {
+    public void start(Stage primaryStage)  {
+        try {
+            socket=new Socket("127.0.0.1",8999);
+            ois=new ObjectInputStream(socket.getInputStream());
+            oos=new ObjectOutputStream(socket.getOutputStream());
+            user login = new user("Gaurav","12345");
+            oos.writeObject(login);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         loader = new FXMLLoader(getClass().getResource("Chat_Window.fxml"));
         try
         {
@@ -66,6 +75,7 @@ public class Chat_App_Window extends Application {
         controller.refresh();
         reciever.ois=ois;
         reciever.controller=controller;
+        reciever.connection=connection;
         t.start();
         primaryStage.setTitle("Chat Window!");
         primaryStage.setScene(new Scene(DisplayPane));
