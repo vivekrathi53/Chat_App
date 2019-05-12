@@ -43,7 +43,7 @@ public class ChatWindowController
     public ClientReciever reciever;
     public ArrayList<Message> chats;
     public ArrayList<String> friends;
-    private String username;
+    public String username;
 
     public void addChat(String username)
     {
@@ -68,7 +68,7 @@ public class ChatWindowController
             }
         }
     }
-    private void fetchAllChats(String username)// Fetch All chats of user from local database
+    public void fetchAllChats()// Fetch All chats of user from local database
     {
         if(chats!=null)
             chats.clear();
@@ -93,7 +93,7 @@ public class ChatWindowController
         chats = new ArrayList<>();
         friends= new ArrayList<>();
         HashMap<String,Integer> hs = new HashMap<String, Integer>();
-        fetchAllChats(username);
+        fetchAllChats();
         for(int i=0;i<chats.size();i++)
         {
             try {

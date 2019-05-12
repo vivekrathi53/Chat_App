@@ -19,12 +19,9 @@ public class ClientReciever implements Runnable
             try
             {
                 obj = ois.readObject();
-            } catch (IOException e)
+            } catch (Exception e)
             {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e)
-            {
-                e.printStackTrace();
+                return ;
             }
             if(obj instanceof Message)
             {
@@ -48,7 +45,29 @@ public class ClientReciever implements Runnable
             }
             else if(obj instanceof SystemMessage)
             {
+                SystemMessage temp = (SystemMessage) obj;
+                if(temp.valid==1)// recieved
+                {
+                    String q="INSERT INTO LocalChats members (ReceivedTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND ReceiverTime = NULL";
+                    try {
+                        PreparedStatement ps = connection.prepareStatement(q);
+                        ps.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
 
+                }
+                else if(temp.valid==2)// seen
+                {
+                    String q="INSERT INTO LocalChats members (SeenTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND SeenTime = NULL";
+                    try {
+                        PreparedStatement ps = connection.prepareStatement(q);
+                        ps.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                controller.refresh();
             }
         }
     }

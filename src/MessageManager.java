@@ -20,7 +20,7 @@ public class MessageManager
     public void insert(String users,Object obj) throws ClassNotFoundException, SQLException
     {
         Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://http://192.168.0.100:3306/Chat_App";
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url, "root", "password");
         int valid=-1;
         String sender = null,content=null;
@@ -42,7 +42,7 @@ public class MessageManager
             content=null;
         }
         String table=users+"Table";
-        String query1 = "INSERT INTO =' + (table)+ ' VALUES (?, ?, ?, ?)";
+        String query1 = "INSERT INTO "+(table)+" VALUES (?, ?, ?, ?)";
         PreparedStatement preStat = connection.prepareStatement(query1);
         preStat.setString(1, sender);
         preStat.setInt(2, valid);
@@ -81,7 +81,7 @@ public class MessageManager
             System.out.println("Name - " + sender);
             System.out.println("content - " + content);
             System.out.println("valid - " + valid);
-            if (valid == 1 || valid == 0)// Message Sent is Received or Seen
+            if (valid == 1 || valid == 2)// Message Sent is Received or Seen
             {//1 Received Time 2 Seen Time
                 oos = new ObjectOutputStream(user.getOutputStream());
                 SystemMessage sm=new SystemMessage(sender ,valid, time);
@@ -111,15 +111,8 @@ public class MessageManager
                 }
                 else//if sender is offline
                 {
-                    table = sender+ "Table";
-                    query = "INSERT INTO '" + (table) + "'";
-                    preStat = connection.prepareStatement(query);
-                    result = preStat.executeQuery(query);
-                    if(result.next())
-                    {
-                        SystemMessage sm=new SystemMessage(username,1,time);//Sender get Receiving time of his message
-                        insert(sender,sm);
-                    }
+                    SystemMessage sm=new SystemMessage(username,1,time);//Sender get Receiving time of his message
+                    insert(sender,sm);
                 }
             }
         }
