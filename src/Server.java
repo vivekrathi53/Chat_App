@@ -17,7 +17,7 @@ public class Server
         server.msh = new MessageManager(server);
         try
         {
-            ServerSocket ss=new ServerSocket(9175);
+            ServerSocket ss=new ServerSocket(9155);
             while(true)
             {
                 Socket sc = ss.accept();//request is received

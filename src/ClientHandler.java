@@ -86,7 +86,7 @@ public class ClientHandler implements Runnable,Serializable
                         }
                         else
                         {
-                            msh.insert(ms);
+                            msh.insert(username,ms);
                         }
                     }
                 }

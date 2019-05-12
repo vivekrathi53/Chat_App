@@ -5,6 +5,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 
 public class MessageManager
 {
@@ -15,29 +17,32 @@ public class MessageManager
         server = ss;
     }
 
-    public void insert(Message message) throws ClassNotFoundException, SQLException {
+    public void insert(String users,Object obj) throws ClassNotFoundException, SQLException
+    {
         Class.forName("com.mysql.jdbc.Driver");
         String url = "jdbc:mysql://http://192.168.0.100:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url, "root", "password");
-        String sender = message.getFrom();
-        String content = message.getContent();
-        Timestamp t1 = message.getSentTime();
-        Timestamp t2 = message.getReceivedTime();
-        Timestamp t3 = message.getSeenTime();
-        int valid;
-        Timestamp time;
-        if (t1 == null && t2 == null) {
-            valid = 2;
-            time = t3;//Seen Time
+        int valid=-1;
+        String sender = null,content=null;
+        Timestamp time=null;
+        if(obj instanceof Message )
+        {
+            Message message=(Message)obj;
+            valid=0;//sent message
+            sender = message.getFrom();
+            content = message.getContent();
+            time = message.getSentTime();
         }
-        if (t1 == null && t3 == null) {
-            valid = 1;
-            time = t2;//Receive Time
-        } else {
-            valid = 0;
-            time = t1;//Sent Time
+        else if(obj instanceof SystemMessage)
+        {
+            SystemMessage sm=(SystemMessage)obj;
+            valid=sm.valid;
+            sender=sm.sender;
+            time=sm.time;
+            content=null;
         }
-        String query1 = "INSERT INTO ReceivedTable VALUES (?, ?, ?, ?)";
+        String table=users+"Table";
+        String query1 = "INSERT INTO =' + (table)+ ' VALUES (?, ?, ?, ?)";
         PreparedStatement preStat = connection.prepareStatement(query1);
         preStat.setString(1, sender);
         preStat.setInt(2, valid);
@@ -61,11 +66,11 @@ public class MessageManager
         return temp;
     }
 
-    public void remove(Socket user,String username) throws SQLException, IOException {
-        String table = username + "Table";
-        String query = "SELECT * FROM '" + (table) + "'";
+    public void remove(Socket user,String username) throws SQLException, IOException, ClassNotFoundException {
         String url = "jdbc:mysql://http://192.168.0.100:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url, "root", "password");
+        String table = username + "Table";
+        String query = "SELECT * FROM '" + (table) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet result = preStat.executeQuery(query);
         while (result.next()) {
@@ -77,22 +82,45 @@ public class MessageManager
             System.out.println("Name - " + sender);
             System.out.println("content - " + content);
             System.out.println("valid - " + valid);
-            if (valid == 1 || valid == 0)
-            {
+            if (valid == 1 || valid == 0)// Message Sent is Received or Seen
+            {//1 Received Time 2 Seen Time
                 oos = new ObjectOutputStream(user.getOutputStream());
                 SystemMessage sm=new SystemMessage(sender ,valid, time);
+                oos.writeObject(sm);//USER GET INFO OF RECEIVING  AND SEEN TIME
+                oos.flush();
+                oos.close();
             }
             else
             {
                 Socket receiver = find(sender);
-                if (receiver != null)// IF USER IS ACTIVE
+                oos = new ObjectOutputStream(user.getOutputStream());
+                Message ms=new Message(username,sender,content,time,null,null);
+                oos.writeObject(ms);//Sent message to User
+                oos.flush();
+                oos.close();
+                LocalDateTime datetime1 = LocalDateTime.now();//To get Local time
+                time= Timestamp.valueOf(datetime1);
+                //System.out.println(datetime1);
+                if (receiver != null)// if Sender is online
                 {
-                    oos = new ObjectOutputStream(receiver.getOutputStream());
                     System.out.println("User is Active");
-                    Message ms=new Message(username,sender,content,time,null,null);
-                    oos.writeObject(ms);
+                    oos = new ObjectOutputStream(receiver.getOutputStream());
+                    SystemMessage sm=new SystemMessage(username ,1,time );
+                    oos.writeObject(sm);//Sender get Info of receiving time
                     oos.flush();
                     oos.close();
+                }
+                else//if sender is offline
+                {
+                    table = sender+ "Table";
+                    query = "INSERT INTO '" + (table) + "'";
+                    preStat = connection.prepareStatement(query);
+                    result = preStat.executeQuery(query);
+                    if(result.next())
+                    {
+                        SystemMessage sm=new SystemMessage(username,1,time);//Sender get Receiving time of his message
+                        insert(sender,sm);
+                    }
                 }
             }
         }
