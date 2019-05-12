@@ -32,17 +32,20 @@ public class Chat_App_Window extends Application {
 
     @Override
     public void start(Stage primaryStage)  {
-        try {
-            socket=new Socket("127.0.0.1",8999);
-            ois=new ObjectInputStream(socket.getInputStream());
+        try
+        {
+            socket=new Socket("127.0.0.1",4352);
             oos=new ObjectOutputStream(socket.getOutputStream());
+            ois=new ObjectInputStream(socket.getInputStream());
             user login = new user("Gaurav","12345");
             oos.writeObject(login);
             oos.flush();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         loader = new FXMLLoader(getClass().getResource("Chat_Window.fxml"));
+
         try
         {
             DisplayPane  = (AnchorPane) loader.load();

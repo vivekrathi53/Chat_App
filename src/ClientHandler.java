@@ -28,6 +28,7 @@ public class ClientHandler implements Runnable {
             ois = new ObjectInputStream(sc.getInputStream());
             oos = new ObjectOutputStream(sc.getOutputStream());
             obj = ois.readObject();
+            System.out.println("Reached");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -94,11 +95,12 @@ public class ClientHandler implements Runnable {
     public boolean authenticate() throws ClassNotFoundException, SQLException //To authentication
     {
         Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/";
-        Connection connection = DriverManager.getConnection(url,username,password);
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
+        Connection connection = DriverManager.getConnection(url,"root","password");
         String query = "SELECT Password FROM UserTable WHERE UserName='" + (username) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet rs = preStat.executeQuery(query);
+        System.out.println("Authenticated");
         if (rs.next()) {
             String CheckPassword = rs.getString("Password");
             if (CheckPassword.equals(password)) {
@@ -107,5 +109,6 @@ public class ClientHandler implements Runnable {
                 return false;
             }
         } else return false;
+
     }
 }

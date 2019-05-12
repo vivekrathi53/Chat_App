@@ -17,13 +17,14 @@ public class Server
         Server server=new Server();
         try
         {
-            ServerSocket ss=new ServerSocket(8999);
+            ServerSocket ss=new ServerSocket(4352);
             while(true)
             {
                 Socket sc = ss.accept();//request is received
                 ClientHandler auth=new ClientHandler(sc,server,msh);
                 Thread t=new Thread(auth);
                 t.start();
+                System.out.println("HII");
                 activelist.add(new Pair<String, Socket>("", sc));
             }
         }
