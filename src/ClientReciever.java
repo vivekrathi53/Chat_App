@@ -9,6 +9,7 @@ public class ClientReciever implements Runnable
     public ChatWindowController controller;
     Connection connection;
     ObjectInputStream ois;
+
     @Override
     public void run()
     {

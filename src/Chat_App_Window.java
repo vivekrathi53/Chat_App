@@ -34,7 +34,7 @@ public class Chat_App_Window extends Application {
     public void start(Stage primaryStage)  {
         try
         {
-            socket=new Socket("127.0.0.1",4352);
+            socket=new Socket("127.0.0.1",9155);
             oos=new ObjectOutputStream(socket.getOutputStream());
             ois=new ObjectInputStream(socket.getInputStream());
             user login = new user("Gaurav","12345");

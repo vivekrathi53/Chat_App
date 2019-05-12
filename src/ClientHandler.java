@@ -3,10 +3,11 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.sql.*;
 
-public class ClientHandler implements Runnable
+public class ClientHandler implements Runnable,Serializable
 {
     Socket sc;
     Server server;
@@ -20,6 +21,24 @@ public class ClientHandler implements Runnable
         sc = so;
         server=ss;
         msh=ms;
+    }
+
+    public Socket find(String sender)
+    {
+        int flag=0;
+        Socket temp=null;
+        for (Pair<String, Socket> value : server.activelist)
+        {
+            String check = value.getKey();
+            if (check == sender)
+            {
+                temp = value.getValue();
+                flag = 1;
+                break;
+            }
+            System.out.print(value);
+        }
+        return temp;
     }
 
     public void run()
@@ -47,25 +66,15 @@ public class ClientHandler implements Runnable
             try {
                 if (authenticate())
                 {
-                    while (true) {
-                        Socket receiver = null;
-                        int flag = 0;
+                    msh.remove(sc,username);
+                    while (true)
+                    {
                         ois = new ObjectInputStream(sc.getInputStream());
                         obj = ois.readObject();
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
-                        for (Pair<String, Socket> value : server.activelist)
-                        {
-                            String check = value.getKey();
-                            if (check == receirver)
-                            {
-                                receiver = value.getValue();
-                                flag = 1;
-                                break;
-                            }
-                            System.out.print(value);
-                        }
-                        if (flag == 1)// IF USER IS ACTIVE
+                        Socket receiver=find(receirver);
+                        if (receiver!=null)// IF USER IS ACTIVE
                         {
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
@@ -77,7 +86,7 @@ public class ClientHandler implements Runnable
                         }
                         else
                         {
-                            msh.insert(ms);
+                            msh.insert(username,ms);
                         }
                     }
                 }
@@ -101,20 +110,24 @@ public class ClientHandler implements Runnable
     public boolean authenticate() throws ClassNotFoundException, SQLException //To authentication
     {
         Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://http://192.168.0.100:3306/Chat_App";
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url,"root","password");
-        String query = "SELECT Password FROM User Table WHERE UserName='" + (username) + "'";
+        String query = "SELECT Password FROM UserTable WHERE UserName='" + (username) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet rs = preStat.executeQuery(query);
         if (rs.next())
         {
             String CheckPassword = rs.getString("Password");
-            if (CheckPassword.equals(password)) {
+            if (CheckPassword.equals(password))
+            {
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
-        else return false;
+        else
+            return false;
     }
 }

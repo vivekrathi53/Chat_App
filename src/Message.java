@@ -10,19 +10,13 @@ public class Message implements Serializable
     private Timestamp ReceivedTime;
     private Timestamp SeenTime;
 
-    public String getFrom() {
+    public String getFrom()
+    {
         return from;
     }
 
     public void setFrom(String from) {
         this.from = from;
-    }
-
-    public Message(String from, String to, String content, Timestamp sentTime) {
-        this.from = from;
-        this.to = to;
-        this.content = content;
-        SentTime = sentTime;
     }
 
     public Message(String from, String to, String content, Timestamp sentTime, Timestamp receivedTime, Timestamp seenTime) {
