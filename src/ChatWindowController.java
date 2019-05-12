@@ -93,5 +93,8 @@ public class ChatWindowController
         mdc.SenderName.setText(mesg.getFrom());
         VerticalPane.getChildren().add(vbox);
     }
-
+    public void addChatToDisplay(String user)
+    {
+        AllChats.getChildren().add(new Label(user));
+    }
 }
