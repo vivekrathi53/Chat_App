@@ -13,7 +13,8 @@ public class MessageManager
     Server server;
     ObjectOutputStream oos;
 
-    public MessageManager(Server ss) {
+    public MessageManager(Server ss)
+    {
         server = ss;
     }
 
@@ -87,7 +88,7 @@ public class MessageManager
                 SystemMessage sm=new SystemMessage(sender ,valid, time);
                 oos.writeObject(sm);//USER GET INFO OF RECEIVING  AND SEEN TIME
                 oos.flush();
-                oos.close();
+
             }
             else
             {
@@ -96,7 +97,7 @@ public class MessageManager
                 Message ms=new Message(username,sender,content,time,null,null);
                 oos.writeObject(ms);//Sent message to User
                 oos.flush();
-                oos.close();
+
                 LocalDateTime datetime1 = LocalDateTime.now();//To get Local time
                 time= Timestamp.valueOf(datetime1);
                 //System.out.println(datetime1);
@@ -107,7 +108,7 @@ public class MessageManager
                     SystemMessage sm=new SystemMessage(username ,1,time );
                     oos.writeObject(sm);//Sender get Info of receiving time
                     oos.flush();
-                    oos.close();
+
                 }
                 else//if sender is offline
                 {

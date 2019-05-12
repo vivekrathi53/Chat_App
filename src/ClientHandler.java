@@ -46,8 +46,9 @@ public class ClientHandler implements Runnable,Serializable
         Object obj = null;
         try
         {
-            ois = new ObjectInputStream(sc.getInputStream());
             oos = new ObjectOutputStream(sc.getOutputStream());
+            ois = new ObjectInputStream(sc.getInputStream());
+
             obj = ois.readObject();
         }
         catch (IOException e)
@@ -69,7 +70,6 @@ public class ClientHandler implements Runnable,Serializable
                     msh.remove(sc,username);
                     while (true)
                     {
-                        ois = new ObjectInputStream(sc.getInputStream());
                         obj = ois.readObject();
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
@@ -82,7 +82,6 @@ public class ClientHandler implements Runnable,Serializable
                             oos=new ObjectOutputStream(receiver.getOutputStream());
                             oos.writeObject(ms);
                             oos.flush();
-                            oos.close();
                         }
                         else
                         {
@@ -92,10 +91,7 @@ public class ClientHandler implements Runnable,Serializable
                 }
                 else
                 {
-                    String mess = "Invalid Username";
-                    oos.writeObject(mess);
-                    oos.flush();
-                    oos.close();
+                    // Invalid authentication message already sent in Authenticate function itself
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -120,10 +116,24 @@ public class ClientHandler implements Runnable,Serializable
             String CheckPassword = rs.getString("Password");
             if (CheckPassword.equals(password))
             {
+                Authentication auth = new Authentication(true,"Successful");
+                try {
+                    oos.writeObject(auth);
+                    oos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
             else
             {
+                Authentication auth = new Authentication(false,"Invalid Login Credientials");
+                try {
+                    oos.writeObject(auth);
+                    oos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return false;
             }
         }

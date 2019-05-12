@@ -1,13 +1,9 @@
-import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -40,7 +36,7 @@ public class ChatWindowController
     public ObjectInputStream ois;
     public ObjectOutputStream oos;
     public Stage currentStage;
-    public ClientReciever reciever;
+    public ClientReceiver reciever;
     public ArrayList<Message> chats;
     public ArrayList<String> friends;
     public String username;

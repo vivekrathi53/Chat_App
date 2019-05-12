@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class ClientReciever implements Runnable
+public class ClientReceiver implements Runnable
 {
     public ChatWindowController controller;
     Connection connection;
@@ -21,12 +21,13 @@ public class ClientReciever implements Runnable
                 obj = ois.readObject();
             } catch (Exception e)
             {
-                return ;
+                e.printStackTrace();
+                return;
             }
             if(obj instanceof Message)
             {
                 Message temp = (Message)obj;
-                String q="INSERT INTO LocalChats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"','"+(temp.getSentTime())+"','"+(temp.getReceivedTime())+"','"+(temp.getSeenTime())+"')";
+                String q="INSERT INTO LocalChats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"','"+(temp.getSentTime()==null?"NULL":temp.getSentTime())+"','"+(temp.getReceivedTime()==null?"NULL":temp.getReceivedTime())+"','"+(temp.getSeenTime()==null?"NULL":temp.getSeenTime())+"')";
                 try {
                     PreparedStatement ps = connection.prepareStatement(q);
                     ps.executeUpdate();
