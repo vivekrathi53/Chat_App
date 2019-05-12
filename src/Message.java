@@ -10,7 +10,8 @@ public class Message implements Serializable
     private Timestamp ReceivedTime;
     private Timestamp SeenTime;
 
-    public String getFrom() {
+    public String getFrom()
+    {
         return from;
     }
 

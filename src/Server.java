@@ -14,10 +14,10 @@ public class Server
     {
         Server server=new Server();
         server.activelist=new ArrayList<Pair<String, Socket>>();
-        server.msh = new MessageManager();
+        server.msh = new MessageManager(server);
         try
         {
-            ServerSocket ss=new ServerSocket(4176);
+            ServerSocket ss=new ServerSocket(9175);
             while(true)
             {
                 Socket sc = ss.accept();//request is received
