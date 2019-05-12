@@ -15,15 +15,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ChatWindowController
 {
     public Connection connection;
+    @FXML
+    Label currentUserStatus;
     @FXML
     Button Send;
     @FXML
@@ -34,23 +34,39 @@ public class ChatWindowController
     VBox VerticalPane;
     @FXML
     VBox AllChats;
+    @FXML
+    Label currentUser;
     public Socket socket;
     public ObjectInputStream ois;
     public ObjectOutputStream oos;
     public Stage currentStage;
     public ClientReciever reciever;
     public ArrayList<Message> chats;
+    public ArrayList<String> friends;
     private String username;
 
     public void addChat(String username)
     {
         Label name = new Label(username);
         AllChats.getChildren().add(name);
-        name.setOnMouseClicked(e -> display(username));
+        name.setOnMouseClicked(e -> {
+            try {
+                display(username);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
     }
-    public void display(String username)// Current Chats of user with username person displayed
+    public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
-
+        VerticalPane.getChildren().clear();
+        for(int i=0;i<chats.size();i++)
+        {
+            if(chats.get(i).getFrom().equals(username))
+            {
+                addMessageToDisplay(chats.get(i));
+            }
+        }
     }
     private void fetchAllChats(String username)// Fetch All chats of user from local database
     {
@@ -73,17 +89,46 @@ public class ChatWindowController
     }
     public void refresh()
     {
+        Send.setOnMouseClicked(e -> sendMessage());
         chats = new ArrayList<>();
+        friends= new ArrayList<>();
+        HashMap<String,Integer> hs = new HashMap<String, Integer>();
         fetchAllChats(username);
         for(int i=0;i<chats.size();i++)
         {
             try {
-                addMessageToDisplay(chats.get(i));
+                if(chats.get(i).getFrom().equals(currentUser))addMessageToDisplay(chats.get(i));
+                if((!hs.containsKey(chats.get(i).getFrom()))&&(!chats.get(i).getFrom().equals(username)))
+                {
+                    friends.add(chats.get(i).getFrom());
+                    Label person = new Label(chats.get(i).getFrom());
+                    AllChats.getChildren().add(person);
+                    person.setOnMouseClicked(e -> {
+                        try {
+                            display(person.getText());
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    });
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    public void sendMessage()
+    {
+        Message msg = new Message(username,currentUser.getText(),textBox.getText(),new Timestamp(System.currentTimeMillis()),null,null);
+        try {
+            oos.writeObject(msg);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void addMessageToDisplay(Message mesg) throws IOException
     {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("MessageDisplay.fxml"));
@@ -97,4 +142,5 @@ public class ChatWindowController
     {
         AllChats.getChildren().add(new Label(user));
     }
+
 }
