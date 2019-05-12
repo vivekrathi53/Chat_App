@@ -8,24 +8,23 @@ import java.util.ArrayList;
 public class Server
 {
 
-    public static ArrayList<Pair<String, Socket>> activelist;
-
+    public  ArrayList<Pair<String, Socket>> activelist;
+    public MessageManager msh;
     public static void main(String[] args)
     {
-        activelist=new ArrayList<Pair<String, Socket>>();
-        Messagemanager msh = new Messagemanager();
         Server server=new Server();
+        server.activelist=new ArrayList<Pair<String, Socket>>();
+        server.msh = new MessageManager();
         try
         {
-            ServerSocket ss=new ServerSocket(4352);
+            ServerSocket ss=new ServerSocket(4176);
             while(true)
             {
                 Socket sc = ss.accept();//request is received
-                ClientHandler auth=new ClientHandler(sc,server,msh);
+                ClientHandler auth=new ClientHandler(sc,server,server.msh);
                 Thread t=new Thread(auth);
                 t.start();
-                System.out.println("HII");
-                activelist.add(new Pair<String, Socket>("", sc));
+                server.activelist.add(new Pair<String, Socket>("", sc));
             }
         }
         catch (IOException e) {
