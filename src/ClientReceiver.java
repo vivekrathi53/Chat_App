@@ -27,7 +27,7 @@ public class ClientReceiver implements Runnable
             if(obj instanceof Message)
             {
                 Message temp = (Message)obj;
-                String q="INSERT INTO LocalChats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"','"+(temp.getSentTime()==null?"NULL":temp.getSentTime())+"','"+(temp.getReceivedTime()==null?"NULL":temp.getReceivedTime())+"','"+(temp.getSeenTime()==null?"NULL":temp.getSeenTime())+"')";
+                String q="INSERT INTO LocalChats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
                 try {
                     PreparedStatement ps = connection.prepareStatement(q);
                     ps.executeUpdate();
@@ -49,7 +49,7 @@ public class ClientReceiver implements Runnable
                 SystemMessage temp = (SystemMessage) obj;
                 if(temp.valid==1)// recieved
                 {
-                    String q="INSERT INTO LocalChats members (ReceivedTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND ReceiverTime = NULL";
+                    String q="INSERT INTO LocalChats members (ReceivedTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND ReceivedTime = null";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -60,7 +60,7 @@ public class ClientReceiver implements Runnable
                 }
                 else if(temp.valid==2)// seen
                 {
-                    String q="INSERT INTO LocalChats members (SeenTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND SeenTime = NULL";
+                    String q="INSERT INTO LocalChats members (SeenTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND SeenTime = null";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
