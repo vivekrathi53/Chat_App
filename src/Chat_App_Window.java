@@ -28,7 +28,7 @@ public class Chat_App_Window extends Application {
 
 
     @Override
-    public void start(Stage primaryStage)  {
+    public void start(Stage primaryStage) throws IOException, ClassNotFoundException {
 
         loader = new FXMLLoader(getClass().getResource("Chat_Window.fxml"));
 
@@ -53,6 +53,9 @@ public class Chat_App_Window extends Application {
             e.printStackTrace();
         }
         reciever = new ClientReceiver();
+        reciever.ois=ois;
+        reciever.controller=controller;
+        reciever.connection=connection;
         Thread t = new Thread(reciever);
         window=primaryStage;
         controller.socket = socket;
@@ -61,9 +64,6 @@ public class Chat_App_Window extends Application {
         controller.currentStage = primaryStage;
         controller.connection=connection;
         controller.refresh();
-        reciever.ois=ois;
-        reciever.controller=controller;
-        reciever.connection=connection;
         t.start();
         primaryStage.setTitle("Chat Window!");
         primaryStage.setScene(new Scene(DisplayPane));

@@ -12,17 +12,18 @@ public class MessageManager
 {
     Server server;
     ObjectOutputStream oos;
+    ObjectOutputStream oos2;
+    Connection connection;
 
-    public MessageManager(Server ss)
-    {
+    public MessageManager(Server ss) throws Exception {
+        Class.forName("com.mysql.jdbc.Driver");
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
+        connection = DriverManager.getConnection(url, "root", "password");
         server = ss;
     }
 
     public void insert(String users,Object obj) throws ClassNotFoundException, SQLException
     {
-        Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/Chat_App";
-        Connection connection = DriverManager.getConnection(url, "root", "password");
         int valid=-1;
         String sender = null,content=null;
         Timestamp time=null;
@@ -55,21 +56,24 @@ public class MessageManager
     public Socket find(String sender) {
         int flag = 0;
         Socket temp = null;
+        int i=0;
         for (Pair<String, Socket> value : server.activelist) {
             String check = value.getKey();
-            if (check == sender) {
+            if (check == sender)
+            {
                 temp = value.getValue();
                 flag = 1;
                 break;
             }
-            System.out.print(value);
+            //System.out.print(value);
+            i++;
         }
+        System.out.println(temp);
+        if(i<server.activeUserStreams.size())oos2=server.activeUserStreams.get(i).getValue();
         return temp;
     }
 
     public void remove(Socket user,String username) throws SQLException, IOException, ClassNotFoundException {
-        String url = "jdbc:mysql://localhost:3306/Chat_App";
-        Connection connection = DriverManager.getConnection(url, "root", "password");
         String table = username + "Table";
         String query = "SELECT * FROM " + (table) + "";
         PreparedStatement preStat = connection.prepareStatement(query);
@@ -84,7 +88,7 @@ public class MessageManager
             System.out.println("valid - " + valid);
             if (valid == 1 || valid == 2)// Message Sent is Received or Seen
             {//1 Received Time 2 Seen Time
-                oos = new ObjectOutputStream(user.getOutputStream());
+
                 SystemMessage sm=new SystemMessage(sender ,valid, time);
                 oos.writeObject(sm);//USER GET INFO OF RECEIVING  AND SEEN TIME
                 oos.flush();
@@ -93,7 +97,6 @@ public class MessageManager
             else
             {
                 Socket receiver = find(sender);
-                oos = new ObjectOutputStream(user.getOutputStream());
                 Message ms=new Message(username,sender,content,time,null,null);
                 oos.writeObject(ms);//Sent message to User
                 oos.flush();
@@ -104,14 +107,14 @@ public class MessageManager
                 if (receiver != null)// if Sender is online
                 {
                     System.out.println("User is Active");
-                    oos = new ObjectOutputStream(receiver.getOutputStream());
                     SystemMessage sm=new SystemMessage(username ,1,time );
-                    oos.writeObject(sm);//Sender get Info of receiving time
-                    oos.flush();
+                    oos2.writeObject(sm);//Sender get Info of receiving time
+                    oos2.flush();
 
                 }
                 else//if sender is offline
                 {
+
                     SystemMessage sm=new SystemMessage(username,1,time);//Sender get Receiving time of his message
                     insert(sender,sm);
                 }

@@ -46,9 +46,6 @@ public class ClientHandler implements Runnable,Serializable
         Object obj = null;
         try
         {
-            oos = new ObjectOutputStream(sc.getOutputStream());
-            ois = new ObjectInputStream(sc.getInputStream());
-
             obj = ois.readObject();
         }
         catch (IOException e)
@@ -67,6 +64,7 @@ public class ClientHandler implements Runnable,Serializable
             try {
                 if (authenticate())
                 {
+                    msh.oos=oos;
                     msh.remove(sc,username);
                     while (true)
                     {
@@ -79,7 +77,6 @@ public class ClientHandler implements Runnable,Serializable
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
                             ms.setSeenTime(ms.getSentTime());
-                            oos=new ObjectOutputStream(receiver.getOutputStream());
                             oos.writeObject(ms);
                             oos.flush();
                         }
