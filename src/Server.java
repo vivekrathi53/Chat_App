@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 
 public class Server
@@ -13,7 +15,12 @@ public class Server
     public  ArrayList<Pair<String, Socket>> activelist;
     public ArrayList<Pair<ObjectInputStream, ObjectOutputStream>> activeUserStreams;
     public MessageManager msh;
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) throws Exception
+    {
+        Class.forName("com.mysql.jdbc.Driver");
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
+        Connection connection = DriverManager.getConnection(url,"root","password");
         Server server=new Server();
         server.activelist=new ArrayList<Pair<String, Socket>>();
         server.activeUserStreams=new ArrayList<>();
@@ -24,11 +31,11 @@ public class Server
             while(true)
             {
                 Socket sc = ss.accept();//request is received
-                ClientHandler auth=new ClientHandler(sc,server,server.msh);
-                Thread t=new Thread(auth);
-                server.activelist.add(new Pair<String, Socket>("", sc));
                 ObjectOutputStream oos = new ObjectOutputStream(sc.getOutputStream());
                 ObjectInputStream ois = new ObjectInputStream(sc.getInputStream());
+                ClientHandler auth=new ClientHandler(sc,server,server.msh,oos,ois,connection);
+                Thread t=new Thread(auth);
+                server.activelist.add(new Pair<String, Socket>("", sc));
                 server.activeUserStreams.add(new Pair<>(ois,oos));
                 auth.oos=oos;
                 auth.ois=ois;

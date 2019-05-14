@@ -15,7 +15,8 @@ public class MessageManager
     ObjectOutputStream oos2;
     Connection connection;
 
-    public MessageManager(Server ss) throws Exception {
+    public MessageManager(Server ss) throws Exception
+    {
         Class.forName("com.mysql.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/Chat_App";
         connection = DriverManager.getConnection(url, "root", "password");
@@ -69,7 +70,10 @@ public class MessageManager
             i++;
         }
         System.out.println(temp);
-        if(i<server.activeUserStreams.size())oos2=server.activeUserStreams.get(i).getValue();
+        if(i<server.activeUserStreams.size())
+        {
+            oos2=server.activeUserStreams.get(i).getValue();
+        }
         return temp;
     }
 
@@ -92,7 +96,6 @@ public class MessageManager
                 SystemMessage sm=new SystemMessage(sender ,valid, time);
                 oos.writeObject(sm);//USER GET INFO OF RECEIVING  AND SEEN TIME
                 oos.flush();
-
             }
             else
             {

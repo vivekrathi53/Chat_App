@@ -1,4 +1,5 @@
 import javafx.util.Pair;
+import sun.net.ConnectionResetException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,12 +16,16 @@ public class ClientHandler implements Runnable,Serializable
     ObjectInputStream ois;
     MessageManager msh;
     String username, password;
+    Connection connection;
 
-    public ClientHandler(Socket so, Server ss, MessageManager ms)
+    public ClientHandler(Socket so, Server ss, MessageManager ms,ObjectOutputStream oos,ObjectInputStream ois,Connection connection)
     {
         sc = so;
         server=ss;
         msh=ms;
+        this.oos=oos;
+        this.ois=ois;
+        this.connection=connection;
     }
 
     public Socket find(String sender)
@@ -61,18 +66,24 @@ public class ClientHandler implements Runnable,Serializable
             user temp = (user) obj;
             username = temp.username;
             password = temp.password;
-            try {
+            try
+            {
                 if (authenticate())
                 {
-                    msh.oos=oos;
                     msh.remove(sc,username);
                     while (true)
                     {
-                        obj = ois.readObject();
+                        try {
+                            obj = ois.readObject();
+                        }catch (ConnectionResetException e)
+                        {
+                            e.printStackTrace();
+                            break;
+                        }
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
                         Socket receiver=find(receirver);
-                        if (receiver!=null)// IF USER IS ACTIVE
+                        if (receiver!=null)// IF USER IS ONLINE
                         {
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
@@ -80,15 +91,21 @@ public class ClientHandler implements Runnable,Serializable
                             oos.writeObject(ms);
                             oos.flush();
                         }
-                        else
+                        else// IF USER IS OFFLINE
                         {
                             msh.insert(username,ms);
                         }
                     }
+                    ois.close();
+                    oos.close();
                 }
                 else
                 {
                     // Invalid authentication message already sent in Authenticate function itself
+                    Errors er=new Errors("Invalid User");
+                    oos.writeObject(er);
+                    oos.flush();
+                    oos.close();
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -102,9 +119,6 @@ public class ClientHandler implements Runnable,Serializable
 
     public boolean authenticate() throws ClassNotFoundException, SQLException //To authentication
     {
-        Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/Chat_App";
-        Connection connection = DriverManager.getConnection(url,"root","password");
         String query = "SELECT Password FROM UserTable WHERE UserName='" + (username) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet rs = preStat.executeQuery(query);

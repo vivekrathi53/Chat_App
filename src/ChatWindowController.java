@@ -44,7 +44,7 @@ public class ChatWindowController
     public void addChat(String username)
     {
         Label name = new Label(username);
-        AllChats.getChildren().add(name);
+        AllChats.getChildren().add(name);//Add name of user to vbox
         name.setOnMouseClicked(e -> {
             try {
                 display(username);
