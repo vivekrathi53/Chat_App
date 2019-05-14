@@ -46,8 +46,6 @@ public class ClientHandler implements Runnable,Serializable
         Object obj = null;
         try
         {
-            ois = new ObjectInputStream(sc.getInputStream());
-            oos = new ObjectOutputStream(sc.getOutputStream());
             obj = ois.readObject();
         }
         catch (IOException e)
@@ -66,10 +64,10 @@ public class ClientHandler implements Runnable,Serializable
             try {
                 if (authenticate())
                 {
+                    msh.oos=oos;
                     msh.remove(sc,username);
                     while (true)
                     {
-                        ois = new ObjectInputStream(sc.getInputStream());
                         obj = ois.readObject();
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
@@ -79,10 +77,8 @@ public class ClientHandler implements Runnable,Serializable
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
                             ms.setSeenTime(ms.getSentTime());
-                            oos=new ObjectOutputStream(receiver.getOutputStream());
                             oos.writeObject(ms);
                             oos.flush();
-                            oos.close();
                         }
                         else
                         {
@@ -92,10 +88,7 @@ public class ClientHandler implements Runnable,Serializable
                 }
                 else
                 {
-                    String mess = "Invalid Username";
-                    oos.writeObject(mess);
-                    oos.flush();
-                    oos.close();
+                    // Invalid authentication message already sent in Authenticate function itself
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -110,9 +103,9 @@ public class ClientHandler implements Runnable,Serializable
     public boolean authenticate() throws ClassNotFoundException, SQLException //To authentication
     {
         Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://http://192.168.0.100:3306/Chat_App";
+        String url = "jdbc:mysql://localhost:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url,"root","password");
-        String query = "SELECT Password FROM User Table WHERE UserName='" + (username) + "'";
+        String query = "SELECT Password FROM UserTable WHERE UserName='" + (username) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet rs = preStat.executeQuery(query);
         if (rs.next())
@@ -120,10 +113,24 @@ public class ClientHandler implements Runnable,Serializable
             String CheckPassword = rs.getString("Password");
             if (CheckPassword.equals(password))
             {
+                Authentication auth = new Authentication(true,"Successful");
+                try {
+                    oos.writeObject(auth);
+                    oos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
             else
             {
+                Authentication auth = new Authentication(false,"Invalid Login Credientials");
+                try {
+                    oos.writeObject(auth);
+                    oos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return false;
             }
         }

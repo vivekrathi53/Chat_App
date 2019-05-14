@@ -23,27 +23,13 @@ public class Chat_App_Window extends Application {
     FXMLLoader loader;
     AnchorPane DisplayPane;
     ChatWindowController controller;
-    ClientReciever reciever;
+    ClientReceiver reciever;
     Connection connection;
-    public static void main(String[] args)
-    {
-        launch(args);
-    }
+
 
     @Override
-    public void start(Stage primaryStage)  {
-        try
-        {
-            socket=new Socket("127.0.0.1",4352);
-            oos=new ObjectOutputStream(socket.getOutputStream());
-            ois=new ObjectInputStream(socket.getInputStream());
-            user login = new user("Gaurav","12345");
-            oos.writeObject(login);
-            oos.flush();
+    public void start(Stage primaryStage) throws IOException, ClassNotFoundException {
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         loader = new FXMLLoader(getClass().getResource("Chat_Window.fxml"));
 
         try
@@ -66,19 +52,18 @@ public class Chat_App_Window extends Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        reciever = new ClientReciever();
+        reciever = new ClientReceiver();
+        reciever.ois=ois;
+        reciever.controller=controller;
+        reciever.connection=connection;
         Thread t = new Thread(reciever);
         window=primaryStage;
         controller.socket = socket;
         controller.ois = ois;
         controller.oos = oos;
         controller.currentStage = primaryStage;
-        controller.socket = socket;
         controller.connection=connection;
         controller.refresh();
-        reciever.ois=ois;
-        reciever.controller=controller;
-        reciever.connection=connection;
         t.start();
         primaryStage.setTitle("Chat Window!");
         primaryStage.setScene(new Scene(DisplayPane));

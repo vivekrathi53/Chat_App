@@ -1,13 +1,9 @@
-import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -40,10 +36,10 @@ public class ChatWindowController
     public ObjectInputStream ois;
     public ObjectOutputStream oos;
     public Stage currentStage;
-    public ClientReciever reciever;
+    public ClientReceiver reciever;
     public ArrayList<Message> chats;
     public ArrayList<String> friends;
-    private String username;
+    public String username;
 
     public void addChat(String username)
     {
@@ -68,7 +64,7 @@ public class ChatWindowController
             }
         }
     }
-    private void fetchAllChats(String username)// Fetch All chats of user from local database
+    public void fetchAllChats()// Fetch All chats of user from local database
     {
         if(chats!=null)
             chats.clear();
@@ -93,7 +89,7 @@ public class ChatWindowController
         chats = new ArrayList<>();
         friends= new ArrayList<>();
         HashMap<String,Integer> hs = new HashMap<String, Integer>();
-        fetchAllChats(username);
+        fetchAllChats();
         for(int i=0;i<chats.size();i++)
         {
             try {
