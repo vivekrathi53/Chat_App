@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -17,16 +18,13 @@ public class MessageManager
 
     public MessageManager(Server ss) throws Exception
     {
-        Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/Chat_App";
-        connection = DriverManager.getConnection(url, "root", "password");
         server = ss;
     }
 
     public void insert(String users,Object obj) throws ClassNotFoundException, SQLException
     {
         int valid=-1;
-        String sender = null,content=null;
+        String table=null,sender = null,content=null;
         Timestamp time=null;
         if(obj instanceof Message )
         {
@@ -36,15 +34,16 @@ public class MessageManager
             content = message.getContent();
             time = message.getSentTime();
         }
-        else if(obj instanceof SystemMessage)
-        {
-            SystemMessage sm=(SystemMessage)obj;
-            valid=sm.valid;
-            sender=sm.sender;
-            time=sm.time;
-            content=null;
+        else if(obj instanceof SystemMessage) {
+            SystemMessage sm = (SystemMessage) obj;
+            valid = sm.valid;
+            sender = sm.sender;
+            time = sm.time;
+            content = null;
         }
-        String table=users+"Table";
+        table=users+"Table";
+        System.out.println(table+"---------------");
+        System.out.println(sender+" /"+content);
         String query1 = "INSERT INTO "+(table)+" VALUES (?, ?, ?, ?)";
         PreparedStatement preStat = connection.prepareStatement(query1);
         preStat.setString(1, sender);
@@ -82,7 +81,8 @@ public class MessageManager
         String query = "SELECT * FROM " + (table) + "";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet result = preStat.executeQuery();
-        while (result.next()) {
+        while (result.next())
+        {
             String sender = result.getString("Sender");
             int valid = result.getInt("Valid");
             Timestamp time = result.getTimestamp("Time");
@@ -103,7 +103,6 @@ public class MessageManager
                 Message ms=new Message(username,sender,content,time,null,null);
                 oos.writeObject(ms);//Sent message to User
                 oos.flush();
-
                 LocalDateTime datetime1 = LocalDateTime.now();//To get Local time
                 time= Timestamp.valueOf(datetime1);
                 //System.out.println(datetime1);
@@ -113,11 +112,9 @@ public class MessageManager
                     SystemMessage sm=new SystemMessage(username ,1,time );
                     oos2.writeObject(sm);//Sender get Info of receiving time
                     oos2.flush();
-
                 }
                 else//if sender is offline
                 {
-
                     SystemMessage sm=new SystemMessage(username,1,time);//Sender get Receiving time of his message
                     insert(sender,sm);
                 }

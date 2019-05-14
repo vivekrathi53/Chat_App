@@ -62,6 +62,7 @@ public class LoginWindowController
                 ChattingWindow.oos=oos;
                 ChattingWindow.ois=ois;
                 ChattingWindow.socket=socket;
+                ChattingWindow.username=name.getText();
                 ChattingWindow.start(window);
             }
             else

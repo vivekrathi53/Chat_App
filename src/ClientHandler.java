@@ -13,6 +13,7 @@ public class ClientHandler implements Runnable,Serializable
     Socket sc;
     Server server;
     ObjectOutputStream oos;
+    ObjectOutputStream oos2;
     ObjectInputStream ois;
     MessageManager msh;
     String username, password;
@@ -28,12 +29,11 @@ public class ClientHandler implements Runnable,Serializable
         this.connection=connection;
     }
 
-    public Socket find(String sender)
-    {
-        int flag=0;
-        Socket temp=null;
-        for (Pair<String, Socket> value : server.activelist)
-        {
+    public Socket find(String sender) {
+        int flag = 0;
+        Socket temp = null;
+        int i=0;
+        for (Pair<String, Socket> value : server.activelist) {
             String check = value.getKey();
             if (check == sender)
             {
@@ -41,7 +41,13 @@ public class ClientHandler implements Runnable,Serializable
                 flag = 1;
                 break;
             }
-            System.out.print(value);
+            //System.out.print(value);
+            i++;
+        }
+        System.out.println(temp);
+        if(i<server.activeUserStreams.size())
+        {
+            oos2=server.activeUserStreams.get(i).getValue();
         }
         return temp;
     }
@@ -70,7 +76,9 @@ public class ClientHandler implements Runnable,Serializable
             {
                 if (authenticate())
                 {
+                    msh.oos=oos;
                     msh.remove(sc,username);
+                    System.out.println("Fine");
                     while (true)
                     {
                         try {
@@ -82,18 +90,19 @@ public class ClientHandler implements Runnable,Serializable
                         }
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
+                        System.out.println("----------------"+receirver);
                         Socket receiver=find(receirver);
                         if (receiver!=null)// IF USER IS ONLINE
                         {
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
                             ms.setSeenTime(ms.getSentTime());
-                            oos.writeObject(ms);
-                            oos.flush();
+                            oos2.writeObject(ms);
+                            oos2.flush();
                         }
                         else// IF USER IS OFFLINE
                         {
-                            msh.insert(username,ms);
+                            msh.insert(receirver,ms);
                         }
                     }
                     ois.close();

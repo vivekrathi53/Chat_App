@@ -21,4 +21,5 @@ public class MessageDisplayController
     Label TimeContent;
     @FXML
     Label ReadReceipts;
+
 }

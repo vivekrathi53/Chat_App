@@ -18,16 +18,21 @@ public class Server
 
     public static void main(String[] args) throws Exception
     {
-        Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/Chat_App";
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String url = "jdbc:mysql://192.168.0.100/Chat_App";
         Connection connection = DriverManager.getConnection(url,"root","password");
         Server server=new Server();
         server.activelist=new ArrayList<Pair<String, Socket>>();
         server.activeUserStreams=new ArrayList<>();
         server.msh = new MessageManager(server);
+        server.msh.connection=connection;
         try
         {
-            ServerSocket ss=new ServerSocket(9155);
+            ServerSocket ss=new ServerSocket(8188);
             while(true)
             {
                 Socket sc = ss.accept();//request is received
