@@ -13,8 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class ChatWindowController
 {
@@ -54,8 +53,10 @@ public class ChatWindowController
             }
         });
     }
+
     public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
+        currentUser.setText(username);
         VerticalPane.getChildren().clear();
         for(int i=0;i<chats.size();i++)
         {
@@ -89,28 +90,33 @@ public class ChatWindowController
         Send.setOnMouseClicked(e -> sendMessage());
         chats = new ArrayList<>();
         friends= new ArrayList<>();
-        HashMap<String,Integer> hs = new HashMap<String, Integer>();
-        fetchAllChats();
+        Set<String> hash_Set = new HashSet<String>();
+        fetchAllChats();//To fetch all chat of user
         for(int i=0;i<chats.size();i++)
         {
             try {
-                if(chats.get(i).getFrom().equals(currentUser))addMessageToDisplay(chats.get(i));
-                if((!hs.containsKey(chats.get(i).getFrom()))&&(!chats.get(i).getFrom().equals(username)))
-                {
-                    friends.add(chats.get(i).getFrom());
-                    Label person = new Label(chats.get(i).getFrom());
-                    AllChats.getChildren().add(person);
-                    person.setOnMouseClicked(e -> {
-                        try {
-                            display(person.getText());
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                    });
-                }
-            } catch (IOException e) {
+                if(chats.get(i).getFrom().equals(currentUser))
+                    addMessageToDisplay(chats.get(i));
+                hash_Set.add(chats.get(i).getFrom());
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        Iterator<String> i = hash_Set.iterator();
+        while (i.hasNext())
+        {
+            System.out.println(i.next());
+            friends.add(i.next());
+            Label person = new Label(i.next());
+            AllChats.getChildren().add(person);
+            person.setOnMouseClicked(e -> {
+                try {
+                    display(person.getText());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            });
         }
     }
 

@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -13,11 +8,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainPackage.Signup">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Signup">
     <top>
         <VBox BorderPane.alignment="CENTER">
             <children>
-                <Label contentDisplay="CENTER" prefHeight="126.0" prefWidth="570.0" text="SACRED BAZZAR" textAlignment="CENTER">
+                <Label contentDisplay="CENTER" prefHeight="126.0" prefWidth="570.0" text="CHAT_APP" textAlignment="CENTER">
                     <VBox.margin>
                         <Insets />
                     </VBox.margin>
@@ -59,32 +54,12 @@
                         <Insets left="20.0" top="35.0" />
                     </VBox.margin>
                 </TextArea>
-                <TextArea fx:id="nomobile" prefHeight="55.0" prefWidth="468.0" promptText="nomobile">
-                    <VBox.margin>
-                        <Insets left="20.0" top="30.0" />
-                    </VBox.margin>
-                </TextArea>
-                <TextArea fx:id="nameuser" prefHeight="55.0" prefWidth="468.0" promptText="USERNAME">
+                <TextArea fx:id="nameuser" prefHeight="55.0" prefWidth="468.0" promptText="Password">
                     <VBox.margin>
                         <Insets bottom="20.0" left="20.0" top="20.0" />
                     </VBox.margin>
                 </TextArea>
-                <TextArea fx:id="useraddress" prefHeight="118.0" prefWidth="440.0" promptText="Address">
-                    <VBox.margin>
-                        <Insets left="20.0" />
-                    </VBox.margin>
-                </TextArea>
-                <Button fx:id="SignInButton" mnemonicParsing="false" onAction="#signupcustomer" prefHeight="31.0" prefWidth="141.0" text="Sign in  Customer">
-                    <VBox.margin>
-                        <Insets left="20.0" top="15.0" />
-                    </VBox.margin>
-                </Button>
-                <Button mnemonicParsing="false" onAction="#signupretalier" prefHeight="31.0" prefWidth="141.0" text="Sign in Retalier">
-                    <VBox.margin>
-                        <Insets left="20.0" top="15.0" />
-                    </VBox.margin>
-                </Button>
-                <Button mnemonicParsing="false" onAction="#StartLogin" prefHeight="31.0" prefWidth="140.0" text="Back to Login">
+                <Button mnemonicParsing="false" onAction="#StartLogin" prefHeight="31.0" prefWidth="140.0" text="Submit">
                     <VBox.margin>
                         <Insets left="20.0" top="15.0" />
                     </VBox.margin>
@@ -96,33 +71,7 @@
         </VBox>
     </left>
     <center>
-        <VBox BorderPane.alignment="CENTER">
-            <children>
-                <TextArea fx:id="namelast" maxHeight="60.0" maxWidth="458.0" prefHeight="55.0" prefWidth="458.0" promptText="Last Name">
-                    <padding>
-                        <Insets left="10.0" />
-                    </padding>
-                    <VBox.margin>
-                        <Insets left="10.0" top="35.0" />
-                    </VBox.margin>
-                </TextArea>
-                <TextArea fx:id="codepin" maxWidth="454.0" prefHeight="55.0" prefWidth="454.0" promptText="PIN CODE">
-                    <VBox.margin>
-                        <Insets left="13.0" top="30.0" />
-                    </VBox.margin>
-                </TextArea>
-                <TextArea fx:id="idemail" maxHeight="59.0" maxWidth="456.0" prefHeight="59.0" prefWidth="456.0" promptText="Email ID">
-                    <VBox.margin>
-                        <Insets left="13.0" top="18.0" />
-                    </VBox.margin>
-                </TextArea>
-                <TextArea fx:id="Password" maxHeight="59.0" maxWidth="456.0" prefHeight="59.0" prefWidth="456.0" promptText="Password">
-                    <VBox.margin>
-                        <Insets left="13.0" top="18.0" />
-                    </VBox.margin>
-                </TextArea>
-            </children>
-        </VBox>
+        <VBox BorderPane.alignment="CENTER" />
     </center>
 
 </BorderPane>

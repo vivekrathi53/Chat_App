@@ -120,5 +120,8 @@ public class MessageManager
                 }
             }
         }
+        query = "DELETE * " + (table) + "";
+        preStat = connection.prepareStatement(query);
+        preStat.executeUpdate();
     }
 }
