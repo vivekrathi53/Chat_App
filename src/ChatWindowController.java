@@ -55,6 +55,7 @@ public class ChatWindowController
     }
     public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
+        currentUser.setText(username);
         VerticalPane.getChildren().clear();
         for(int i=0;i<chats.size();i++)
         {
