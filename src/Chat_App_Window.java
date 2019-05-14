@@ -1,3 +1,4 @@
+import com.sun.javafx.binding.StringFormatter;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -25,13 +26,13 @@ public class Chat_App_Window extends Application {
     ChatWindowController controller;
     ClientReceiver reciever;
     Connection connection;
-
+    String username;
 
     @Override
-    public void start(Stage primaryStage) throws IOException, ClassNotFoundException {
+    public void start(Stage primaryStage) throws IOException, ClassNotFoundException
+    {
 
         loader = new FXMLLoader(getClass().getResource("Chat_Window.fxml"));
-
         try
         {
             DisplayPane  = (AnchorPane) loader.load();
@@ -46,7 +47,7 @@ public class Chat_App_Window extends Application {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String url = "jdbc:mysql://localhost:3306/Chat_App";
+        String url = "jdbc:mysql://192.168.0.100:3306/Chat_App";
         try {
             connection = DriverManager.getConnection(url, "root", "password");
         } catch (SQLException e) {
@@ -58,11 +59,12 @@ public class Chat_App_Window extends Application {
         reciever.connection=connection;
         Thread t = new Thread(reciever);
         window=primaryStage;
-        controller.socket = socket;
+        controller.socket = socket;//ChatWindowController getting client object
         controller.ois = ois;
         controller.oos = oos;
         controller.currentStage = primaryStage;
         controller.connection=connection;
+        controller.username=username;
         controller.refresh();
         t.start();
         primaryStage.setTitle("Chat Window!");

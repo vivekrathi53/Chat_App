@@ -1,3 +1,4 @@
+import com.sun.javafx.scene.traversal.SubSceneTraversalEngine;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.fxml.FXML;
@@ -44,7 +45,7 @@ public class ChatWindowController
     public void addChat(String username)
     {
         Label name = new Label(username);
-        AllChats.getChildren().add(name);
+        AllChats.getChildren().add(name);//Add name of user to vbox
         name.setOnMouseClicked(e -> {
             try {
                 display(username);
@@ -64,6 +65,7 @@ public class ChatWindowController
                 addMessageToDisplay(chats.get(i));
             }
         }
+        currentUser.setText(username);
     }
     public void fetchAllChats()// Fetch All chats of user from local database
     {
@@ -81,9 +83,8 @@ public class ChatWindowController
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
+
     public void refresh()
     {
         Send.setOnMouseClicked(e -> sendMessage());
@@ -118,6 +119,7 @@ public class ChatWindowController
     {
         Message msg = new Message(username,currentUser.getText(),textBox.getText(),new Timestamp(System.currentTimeMillis()),null,null);
         try {
+            System.out.println(msg.getContent());
             oos.writeObject(msg);
             oos.flush();
         } catch (IOException e) {
