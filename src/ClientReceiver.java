@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import sun.net.ConnectionResetException;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class ClientReceiver implements Runnable
                 SystemMessage temp = (SystemMessage) obj;
                 if(temp.valid==1)// recieved Time
                 {
-                    String q="INSERT INTO LocalChats members (ReceivedTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND ReceivedTime = null";
+                    String q="UPDATE LocalChats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime=null AND Receiver='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -69,7 +70,7 @@ public class ClientReceiver implements Runnable
                 }
                 else if(temp.valid==2)// seen Time
                 {
-                    String q="INSERT INTO LocalChats members (SeenTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND SeenTime = null";
+                    String q="INSERT INTO LocalChats (SeenTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND SeenTime = null";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -77,7 +78,14 @@ public class ClientReceiver implements Runnable
                         e.printStackTrace();
                     }
                 }
-                controller.refresh();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        controller.refresh();
+                    }
+                });
+
+
             }
             else if(obj instanceof  Errors)//When is user is invalid
             {
