@@ -116,13 +116,19 @@ public class ClientHandler implements Runnable,Serializable
                     oos.flush();
                     oos.close();
                 }
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        else
+        {
+            System.out.println("USER IS SIGN UP");
+
         }
     }
 

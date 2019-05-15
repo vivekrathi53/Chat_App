@@ -8,8 +8,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import src.Signup;
-
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -34,14 +32,14 @@ public class LoginWindowController
     int type;
 
     public Stage window;
-    public void signUp()
+    /*public void signUp()
     {
         try {
             sign();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
     public void Login() throws IOException
     {
         window = (Stage)name.getScene().getWindow();
@@ -81,19 +79,6 @@ public class LoginWindowController
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void sign() throws IOException {
-        window = (Stage)name.getScene().getWindow();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("FXML_files/Signup.fxml"));
-        Parent root = loader.load();
-        Signup controllers = loader.getController();
-        window.setTitle("SignUp Window");
-        window.setScene(new Scene(root));
-        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-        window.setWidth((primScreenBounds.getWidth()));
-        window.setHeight((primScreenBounds.getHeight()));
-        window.show();
     }
 
 }
