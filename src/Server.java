@@ -32,7 +32,7 @@ public class Server
         server.msh.connection=connection;
         try
         {
-            ServerSocket ss=new ServerSocket(8195);
+            ServerSocket ss=new ServerSocket(8188);
             while(true)
             {
                 Socket sc = ss.accept();//request is received

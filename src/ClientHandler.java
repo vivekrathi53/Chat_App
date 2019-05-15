@@ -127,8 +127,13 @@ public class ClientHandler implements Runnable,Serializable
         }
         else
         {
+            Signupclass temp=(Signupclass)obj;
             System.out.println("USER IS SIGN UP");
-
+            try {
+                msh.insertuser(temp);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -9,9 +9,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
-public class Signupcontroller {
+public class Signupcontroller
+{
     @FXML
     Button Submit;
     @FXML
@@ -24,13 +27,13 @@ public class Signupcontroller {
     TextField PortNo;
     private Socket socket;
 
-    @FXML
-
     public void Sign() throws IOException
     {
         socket = new Socket(ServerIP.getText(), Integer.parseInt(PortNo.getText()));
         System.out.println("Connected to server");
-        user data = new user(username.getText(),password.getText());
-
+        Signupclass data = new Signupclass(username.getText(),password.getText());
+        ObjectOutputStream oos=new ObjectOutputStream(socket.getOutputStream());
+        oos.writeObject(data);
+        oos.flush();
     }
 }
