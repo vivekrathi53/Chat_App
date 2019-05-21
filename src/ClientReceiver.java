@@ -13,7 +13,7 @@ public class ClientReceiver implements Runnable
     public ChatWindowController controller;
     Connection connection;
     ObjectInputStream ois;
-
+    String username;
     @Override
     public void run()
     {
@@ -37,7 +37,7 @@ public class ClientReceiver implements Runnable
             if(obj instanceof Message)
             {
                 Message temp = (Message)obj;
-                String q="INSERT INTO LocalChats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
+                String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
                 try {
                     PreparedStatement ps = connection.prepareStatement(q);
                     ps.executeUpdate();
@@ -59,7 +59,7 @@ public class ClientReceiver implements Runnable
                 SystemMessage temp = (SystemMessage) obj;
                 if(temp.valid==1)// recieved Time
                 {
-                    String q="UPDATE LocalChats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime=null AND Receiver='"+temp.sender+"'";
+                    String q="UPDATE Local"+username+"Chats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime=null AND Receiver='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -70,7 +70,7 @@ public class ClientReceiver implements Runnable
                 }
                 else if(temp.valid==2)// seen Time
                 {
-                    String q="INSERT INTO LocalChats (SeenTime) Values('"+temp.time+"') Where Receiver = '"+temp.sender+"' AND SeenTime = null";
+                    String q="UPDATE Local"+username+"Chats SET SeenTime = '"+temp.time+"' WHERE    SeenTime=null AND Receiver='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -78,7 +78,8 @@ public class ClientReceiver implements Runnable
                         e.printStackTrace();
                     }
                 }
-                Platform.runLater(new Runnable() {
+                Platform.runLater(new Runnable()//To perform UI work from different Thread
+                {
                     @Override
                     public void run() {
                         controller.refresh();

@@ -47,7 +47,7 @@ public class Chat_App_Window extends Application {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String url = "jdbc:mysql://192.168.0.100:3306/Chat_App";
+        String url = "jdbc:mysql://127.0.0.1:3306/Chat_App";
         try {
             connection = DriverManager.getConnection(url, "root", "password");
         } catch (SQLException e) {
@@ -57,6 +57,7 @@ public class Chat_App_Window extends Application {
         reciever.ois=ois;
         reciever.controller=controller;
         reciever.connection=connection;
+        reciever.username=username;
         Thread t = new Thread(reciever);
         window=primaryStage;
         controller.socket = socket;//ChatWindowController getting client object

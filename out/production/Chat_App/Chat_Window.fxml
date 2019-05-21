@@ -29,6 +29,7 @@
                </children>
             </HBox>
             <VBox fx:id="AllChats" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1" />
+            <Button fx:id="AddFriend" mnemonicParsing="false" prefHeight="37.0" prefWidth="95.0" text="AddFriend" GridPane.rowIndex="2" />
          </children>
          <columnConstraints>
             <ColumnConstraints />

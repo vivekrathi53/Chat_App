@@ -23,7 +23,7 @@ public class Server
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String url = "jdbc:mysql://192.168.0.100/Chat_App";
+        String url = "jdbc:mysql://127.0.0.1:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url,"root","password");
         Server server=new Server();
         server.activelist=new ArrayList<Pair<String, Socket>>();

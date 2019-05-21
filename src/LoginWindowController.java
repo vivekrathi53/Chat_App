@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -33,14 +32,14 @@ public class LoginWindowController
     int type;
 
     public Stage window;
-    public void signUp()
+    /*public void signUp()
     {
         try {
             sign();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
     public void Login() throws IOException
     {
         window = (Stage)name.getScene().getWindow();
@@ -80,27 +79,6 @@ public class LoginWindowController
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void sign() throws IOException {
-        /*window = (Stage)name.getScene().getWindow();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("FXML_files/Signup.fxml"));
-        Parent root = loader.load();
-        Signup controllers = loader.getController();
-        window.setTitle("SignUp Window");
-    socket = new Socket(ServerIP.getText(),Integer.parseInt(PortNo.getText()));
-
-        System.out.println("Connected to server");
-        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-        controllers.socket = socket;
-        controllers.objectOutputStream = oos;
-        controllers.objectInputStream = ois;
-        window.setScene(new Scene(root));
-        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-        window.setWidth((primScreenBounds.getWidth()));
-        window.setHeight((primScreenBounds.getHeight()));
-        window.show();*/
     }
 
 }

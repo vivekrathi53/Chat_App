@@ -1,9 +1,7 @@
 import com.sun.javafx.scene.traversal.SubSceneTraversalEngine;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -13,8 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class ChatWindowController
 {
@@ -23,6 +20,8 @@ public class ChatWindowController
     Label currentUserStatus;
     @FXML
     Button Send;
+    @FXML
+    Button AddFriend;
     @FXML
     TextArea textBox;
     @FXML
@@ -54,6 +53,7 @@ public class ChatWindowController
             }
         });
     }
+
     public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
         currentUser.setText(username);
@@ -71,7 +71,7 @@ public class ChatWindowController
     {
         if(chats!=null)
             chats.clear();
-        String q="SELECT * FROM LocalChats";
+        String q="SELECT * FROM Local"+username+"Chats";
         PreparedStatement ps=null;
         try {
             ps = connection.prepareStatement(q);
@@ -90,28 +90,49 @@ public class ChatWindowController
         Send.setOnMouseClicked(e -> sendMessage());
         chats = new ArrayList<>();
         friends= new ArrayList<>();
-        HashMap<String,Integer> hs = new HashMap<String, Integer>();
-        fetchAllChats();
+        AddFriend.setOnMouseClicked(e-> addNewFriendChat());
+        Set<String> hash_Set = new HashSet<String>();
+        fetchAllChats();//To fetch all chat of user from Local_Database
         for(int i=0;i<chats.size();i++)
         {
-            try {
-                if(chats.get(i).getFrom().equals(currentUser))addMessageToDisplay(chats.get(i));
-                if((!hs.containsKey(chats.get(i).getFrom()))&&(!chats.get(i).getFrom().equals(username)))
-                {
-                    friends.add(chats.get(i).getFrom());
-                    Label person = new Label(chats.get(i).getFrom());
-                    AllChats.getChildren().add(person);
-                    person.setOnMouseClicked(e -> {
-                        try {
-                            display(person.getText());
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                    });
-                }
-            } catch (IOException e) {
+            try
+            {
+                if(chats.get(i).getFrom().equals(currentUser))
+                    addMessageToDisplay(chats.get(i));
+                hash_Set.add(chats.get(i).getFrom());
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        Iterator<String> i = hash_Set.iterator();
+        while (i.hasNext())
+        {
+            String s=i.next();
+            System.out.println(s);
+            friends.add(s);
+            Label person = new Label(s);
+            AllChats.getChildren().add(person);
+            person.setOnMouseClicked(e -> {
+                try {
+                    display(person.getText());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            });
+        }
+    }
+
+    public void addNewFriendChat()// to add new friend to chats list to talk to him
+    {
+        TextInputDialog dialog = new TextInputDialog("Give UserName of your friend");
+        dialog.setTitle("UserName Input");
+        dialog.setHeaderText("Username Of Friend");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent())
+        {
+            if(!result.get().equals("Give UserName of your friend"))
+                addChat(result.get());
         }
     }
 
@@ -125,7 +146,12 @@ public class ChatWindowController
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        chats.add(msg);
+        try {
+            addMessageToDisplay(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addMessageToDisplay(Message mesg) throws IOException
@@ -135,11 +161,27 @@ public class ChatWindowController
         MessageDisplayController mdc = loader.getController();
         mdc.MessageContent.setText(mesg.getContent());
         mdc.SenderName.setText(mesg.getFrom());
+        mdc.TimeContent.setText((mesg.getSentTime()).toString());
+        mdc.ReadReceipts.setOnMouseClicked(e-> showDetails(mesg));
         VerticalPane.getChildren().add(vbox);
     }
-    public void addChatToDisplay(String user)
+
+    private void showDetails(Message mesg)
     {
-        AllChats.getChildren().add(new Label(user));
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Time Receipts");
+        alert.setHeaderText("Type       Time");
+        String text="SentTime\t"+(mesg.getSentTime()).toString()+"\n";
+        if(mesg.getReceivedTime()!=null)
+            text+=("ReceivedTime\t"+(mesg.getReceivedTime()).toString())+"\n";
+        else
+           text+=("ReceivedTime\t"+"NOT RECEIVED\n");
+        if(mesg.getReceivedTime()!=null)
+            text+=("SeenTime\t"+(mesg.getSeenTime()).toString())+"\n";
+        else
+            text+=("SeenTime\t"+"NOT SEEN\n");
+        alert.setContentText(text);
+        alert.show();
     }
 
 }

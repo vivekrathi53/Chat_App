@@ -21,6 +21,19 @@ public class MessageManager
         server = ss;
     }
 
+    public void insertuser(Signupclass sc) throws SQLException
+    {
+        String query1 = "INSERT INTO UserTable  VALUES (?, ?)";
+        PreparedStatement preStat = connection.prepareStatement(query1);
+        preStat.setString(1, sc.user);
+        preStat.setString(2, sc.password);
+        preStat.executeUpdate();
+        String table=sc.user+"Table";
+        query1="CREATE TABLE " + (table) + " ( Sender varchar(11),Valid int(255),Message text(2000),Time timestamp)";
+        preStat = connection.prepareStatement(query1);
+        preStat.executeUpdate();
+    }
+
     public void insert(String users,Object obj) throws ClassNotFoundException, SQLException
     {
         int valid=-1;
@@ -120,5 +133,8 @@ public class MessageManager
                 }
             }
         }
+        query = "TRUNCATE " + (table) + "";
+        preStat = connection.prepareStatement(query);
+        preStat.executeUpdate();
     }
 }

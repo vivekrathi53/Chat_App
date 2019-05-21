@@ -111,16 +111,23 @@ public class ClientHandler implements Runnable,Serializable
                 else
                 {
                     // Invalid authentication message already sent in Authenticate function itself
-                    Errors er=new Errors("Invalid User");
-                    oos.writeObject(er);
-                    oos.flush();
-                    oos.close();
                 }
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            Signupclass temp=(Signupclass)obj;
+            System.out.println("USER IS SIGN UP");
+            try {
+                msh.insertuser(temp);
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
