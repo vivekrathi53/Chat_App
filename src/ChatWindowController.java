@@ -149,7 +149,19 @@ public class ChatWindowController
         chats.add(msg);
         try {
             addMessageToDisplay(msg);
+            insertIntoDatabase(msg);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertIntoDatabase(Message temp)
+    {
+        String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
+        try {
+            PreparedStatement ps = connection.prepareStatement(q);
+            ps.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

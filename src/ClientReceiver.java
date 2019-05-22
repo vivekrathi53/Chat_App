@@ -53,6 +53,9 @@ public class ClientReceiver implements Runnable
                     }
                 }
                 controller.chats.add(temp);
+                if(!controller.friends.contains(temp.getFrom()))
+                    controller.addChat(temp.getFrom());
+
             }
             else if(obj instanceof SystemMessage)
             {
