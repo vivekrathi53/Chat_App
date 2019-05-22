@@ -30,6 +30,8 @@ public class Signupcontroller
     @FXML
     TextField PortNo;
     private Socket socket;
+    LoginWindow lw;
+    Stage window;
 
     public void Sign() throws IOException
     {
@@ -60,6 +62,11 @@ public class Signupcontroller
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        try {
+            lw=new LoginWindow();
+            lw.start(window);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

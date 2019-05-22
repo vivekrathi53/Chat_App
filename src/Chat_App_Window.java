@@ -48,9 +48,11 @@ public class Chat_App_Window extends Application {
             e.printStackTrace();
         }
         String url = "jdbc:mysql://127.0.0.1:3306/Chat_App";
-        try {
+        try
+        {
             connection = DriverManager.getConnection(url, "root", "password");
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             e.printStackTrace();
         }
         reciever = new ClientReceiver();

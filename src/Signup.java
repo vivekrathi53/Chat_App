@@ -16,8 +16,9 @@ public class Signup extends Application
     public void start(Stage primaryStage) throws Exception
     {
         loader = new FXMLLoader(getClass().getResource("Signup.fxml"));
-        controller=loader.getController();
         Display = loader.load();
+        controller=loader.getController();
+        controller.window=primaryStage;
         window=primaryStage;
         window.setScene(new Scene(Display));
         window.setTitle("SignUp Window");
