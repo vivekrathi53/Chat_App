@@ -188,7 +188,7 @@ public class ChatWindowController
             text+=("ReceivedTime\t"+(mesg.getReceivedTime()).toString())+"\n";
         else
            text+=("ReceivedTime\t"+"NOT RECEIVED\n");
-        if(mesg.getReceivedTime()!=null)
+        if(mesg.getSeenTime()!=null)
             text+=("SeenTime\t"+(mesg.getSeenTime()).toString())+"\n";
         else
             text+=("SeenTime\t"+"NOT SEEN\n");

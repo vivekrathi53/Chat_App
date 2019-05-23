@@ -52,9 +52,19 @@ public class ClientReceiver implements Runnable
                         e.printStackTrace();
                     }
                 }
+
                 controller.chats.add(temp);
                 if(!controller.friends.contains(temp.getFrom()))
-                    controller.addChat(temp.getFrom());
+                {
+                    Platform.runLater(new Runnable()//To perform UI work from different Thread
+                    {
+                        @Override
+                        public void run() {
+                            controller.addChat(temp.getFrom());
+                        }
+                    });
+
+                }
 
             }
             else if(obj instanceof SystemMessage)

@@ -29,27 +29,17 @@ public class ClientHandler implements Runnable,Serializable
         this.connection=connection;
     }
 
-    public Socket find(String sender) {
-        int flag = 0;
-        Socket temp = null;
+    public ObjectOutputStream find(String sender)
+    {
         int i=0;
-        for (Pair<String, Socket> value : server.activelist) {
-            String check = value.getKey();
-            if (check == sender)
-            {
-                temp = value.getValue();
-                flag = 1;
-                break;
-            }
-            //System.out.print(value);
-            i++;
-        }
-        System.out.println(temp);
-        if(i<server.activeUserStreams.size())
+        for(i=0;i<server.activelist.size();i++)
         {
-            oos2=server.activeUserStreams.get(i).getValue();
+            if (server.activelist.get(i).getKey().equals(sender))
+            {
+                return server.activeUserStreams.get(i).getValue();
+            }
         }
-        return temp;
+        return null;
     }
 
     public void run()
@@ -91,14 +81,17 @@ public class ClientHandler implements Runnable,Serializable
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
                         System.out.println("----------------"+receirver);
-                        Socket receiver=find(receirver);
-                        if (receiver!=null)// IF USER IS ONLINE
+                        ObjectOutputStream oosTo=find(receirver);
+                        System.out.println(oosTo);
+                        if (oosTo!=null)// IF USER IS ONLINE
                         {
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
-                            ms.setSeenTime(ms.getSentTime());
-                            oos2.writeObject(ms);
-                            oos2.flush();
+                            oosTo.writeObject(ms);
+                            oosTo.flush();
+                            SystemMessage sm = new SystemMessage(ms.getTo(),1,ms.getSentTime());
+                            oos.writeObject(sm);
+                            oos.flush();
                         }
                         else// IF USER IS OFFLINE
                         {
@@ -150,6 +143,8 @@ public class ClientHandler implements Runnable,Serializable
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                server.activelist.add(new Pair<String,Socket>(username,sc));
+                server.activeUserStreams.add(new Pair<>(ois,oos));
                 return true;
             }
             else

@@ -40,8 +40,6 @@ public class Server
                 ObjectInputStream ois = new ObjectInputStream(sc.getInputStream());
                 ClientHandler auth=new ClientHandler(sc,server,server.msh,oos,ois,connection);
                 Thread t=new Thread(auth);
-                server.activelist.add(new Pair<String, Socket>("", sc));
-                server.activeUserStreams.add(new Pair<>(ois,oos));
                 auth.oos=oos;
                 auth.ois=ois;
                 t.start();
