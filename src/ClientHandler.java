@@ -74,46 +74,34 @@ public class ClientHandler implements Runnable,Serializable
             password = temp.password;
             try
             {
-                if (authenticate())
-                {
-                    msh.oos=oos;
-                    msh.remove(sc,username);
+                if (authenticate()) {
+                    msh.oos = oos;
+                    msh.remove(sc, username);
                     System.out.println("Fine");
-                    while (true)
-                    {
+                    while (true) {
                         try {
                             obj = ois.readObject();
-                        }catch (ConnectionResetException e)
-                        {
+                        } catch (ConnectionResetException e) {
                             e.printStackTrace();
                             break;
                         }
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
-                        System.out.println("----------------"+receirver);
-                        Socket receiver=find(receirver);
-                        if (receiver!=null)// IF USER IS ONLINE
+                        System.out.println("----------------" + receirver);
+                        Socket receiver = find(receirver);
+                        if (receiver != null)// IF USER IS ONLINE
                         {
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
                             ms.setSeenTime(ms.getSentTime());
                             oos2.writeObject(ms);
                             oos2.flush();
-                        }
-                        else// IF USER IS OFFLINE
+                        } else// IF USER IS OFFLINE
                         {
-                            msh.insert(receirver,ms);
+                            msh.insert(receirver, ms);
                         }
                     }
                     ois.close();
-                    oos.close();
-                }
-                else
-                {
-                    // Invalid authentication message already sent in Authenticate function itself
-                    Errors er=new Errors("Invalid User");
-                    oos.writeObject(er);
-                    oos.flush();
                     oos.close();
                 }
             }
@@ -139,6 +127,7 @@ public class ClientHandler implements Runnable,Serializable
 
     public boolean authenticate() throws ClassNotFoundException, SQLException //To authentication
     {
+        System.out.println("HJBJHBJH");
         String query = "SELECT Password FROM UserTable WHERE UserName='" + (username) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet rs = preStat.executeQuery(query);

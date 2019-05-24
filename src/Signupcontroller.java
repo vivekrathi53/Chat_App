@@ -26,14 +26,18 @@ public class Signupcontroller
     @FXML
     TextField PortNo;
     private Socket socket;
+    LoginWindow lw;
 
-    public void Sign() throws IOException
+    public void Sign() throws Exception
     {
+        Stage window = (Stage) password.getScene().getWindow();
         socket = new Socket(ServerIP.getText(), Integer.parseInt(PortNo.getText()));
         System.out.println("Connected to server");
         Signupclass data = new Signupclass(username.getText(),password.getText());
         ObjectOutputStream oos=new ObjectOutputStream(socket.getOutputStream());
         oos.writeObject(data);
         oos.flush();
+        lw=new LoginWindow();
+        lw.start(window);
     }
 }

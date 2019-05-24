@@ -54,7 +54,8 @@ public class LoginWindowController
         try
         {
             System.out.println("reading letter");
-            Authentication a = (Authentication) ois.readObject();
+            Object temp=ois.readObject();
+            Authentication a = (Authentication) temp;
             if(a.auth)
             {
                 Chat_App_Window ChattingWindow = new Chat_App_Window();
