@@ -89,24 +89,48 @@ public class ClientHandler implements Runnable,Serializable
                             e.printStackTrace();
                             break;
                         }
-                        Message ms = (Message) obj;
-                        String receirver = ms.getTo();
-                        System.out.println("----------------"+receirver);
-                        ObjectOutputStream oosTo=find(receirver);
-                        System.out.println(oosTo);
-                        if (oosTo!=null)// IF USER IS ONLINE
+                        if(obj instanceof Message)
                         {
-                            System.out.println("User is Active");
-                            ms.setReceivedTime(ms.getSentTime());
-                            oosTo.writeObject(ms);
-                            oosTo.flush();
-                            SystemMessage sm = new SystemMessage(ms.getTo(),1,ms.getSentTime());
-                            oos.writeObject(sm);
-                            oos.flush();
+                            Message ms = (Message) obj;
+                            String receiver = ms.getTo();
+                            System.out.println("----------------"+receiver);
+                            ObjectOutputStream oosTo=find(receiver);
+                            System.out.println(oosTo);
+                            if (oosTo!=null)// IF USER IS ONLINE
+                            {
+                                System.out.println("User is Active");
+                                ms.setReceivedTime(ms.getSentTime());
+                                oosTo.writeObject(ms);
+                                oosTo.flush();
+                                SystemMessage sm = new SystemMessage(ms.getTo(),1,ms.getSentTime());
+                                oos.writeObject(sm);
+                                oos.flush();
+                            }
+                            else// IF USER IS OFFLINE
+                            {
+                                msh.insert(receiver,ms);
+                            }
                         }
-                        else// IF USER IS OFFLINE
+                        else if(obj instanceof SystemMessage)
                         {
-                            msh.insert(receirver,ms);
+                            SystemMessage sm = (SystemMessage) obj;
+                            String receiver = sm.sender;
+                            System.out.println("----------------"+receiver);
+                            ObjectOutputStream oosTo=find(receiver);
+                            System.out.println(oosTo);
+                            if (oosTo!=null)// IF USER IS ONLINE
+                            {
+                                System.out.println("User is Active");
+                                sm.sender=username;//for person who receives seen receipt will have sender as person who sends this to him
+                                oosTo.writeObject(sm);
+                                oosTo.flush();
+                            }
+                            else// IF USER IS OFFLINE
+                            {
+                                sm.sender=username;//for person who receives seen receipt will have sender as person who sends this to him
+                                msh.insert(receiver,sm);
+                            }
+
                         }
                     }
                     ois.close();

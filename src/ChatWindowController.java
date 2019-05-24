@@ -46,16 +46,47 @@ public class ChatWindowController
         Label name = new Label(username);
         AllChats.getChildren().add(name);//Add name of user to vbox
         name.setOnMouseClicked(e -> {
-            try {
-                display(username);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            seenMessagesof(username);
+
         });
+    }
+
+    public void seenMessagesof(String friend)
+    {
+        Timestamp seenTime=new Timestamp(System.currentTimeMillis());
+        String q="UPDATE Local"+username+"Chats SET SeenTime = '"+seenTime.toString()+"' WHERE SeenTime = '2019-01-01 00:00:00' AND Sender ='"+friend+"'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(q);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for(int i=0;i<chats.size();i++)
+        {
+            if(((chats.get(i).getTo().equals(friend)||chats.get(i).getFrom().equals(friend))&&chats.get(i).getSeenTime()==null))// check for proper object
+            {
+                System.out.println("changed the value");
+                chats.get(i).setSeenTime(seenTime);// update received time in message object
+            }
+        }
+        try {
+            display(friend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SystemMessage sm = new SystemMessage(friend,2,seenTime);
+        try {
+            oos.writeObject(sm);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
+
         currentUser.setText(username);
         VerticalPane.getChildren().clear();
         for(int i=0;i<chats.size();i++)

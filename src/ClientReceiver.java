@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class ClientReceiver implements Runnable
 {
@@ -52,7 +53,11 @@ public class ClientReceiver implements Runnable
                             @Override
                             public void run() {
                                 System.out.println("Changing UI");
-                                try{controller.addMessageToDisplay(temp);}
+                                try
+                                {
+                                    controller.addMessageToDisplay(temp);
+                                    controller.seenMessagesof(temp.getFrom());
+                                }
                                 catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -112,10 +117,15 @@ public class ClientReceiver implements Runnable
                             //System.out.println(temp.sender);
                             //System.out.println(controller.chats.get(i).getFrom());
                             //System.out.println(controller.chats.get(i).getReceivedTime());
-                            if((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getReceivedTime()==null)
+                            if(temp.valid==1&&((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getReceivedTime()==null))// check for proper object
                             {
                                 System.out.println("changed the value");
                                 controller.chats.get(i).setReceivedTime(temp.time);// update received time in message object
+                            }
+                            else if(temp.valid==2&&((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getSeenTime()==null))// check for proper object
+                            {
+                                System.out.println("changed the value");
+                                controller.chats.get(i).setSeenTime(temp.time);// update received time in message object
                             }
                         }
                         try {
@@ -142,4 +152,7 @@ public class ClientReceiver implements Runnable
         }
 
     }
+
+
+
 }
