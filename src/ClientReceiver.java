@@ -1,4 +1,5 @@
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import sun.net.ConnectionResetException;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class ClientReceiver implements Runnable
             if(obj instanceof Message)
             {
                 Message temp = (Message)obj;
-                String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
+                String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"'2019-01-01 00:00:00'":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"'2019-01-01 00:00:00'":("'"+temp.getSeenTime()+"'"))+")";
                 try {
                     PreparedStatement ps = connection.prepareStatement(q);
                     ps.executeUpdate();
@@ -81,7 +82,7 @@ public class ClientReceiver implements Runnable
                 SystemMessage temp = (SystemMessage) obj;
                 if(temp.valid==1)// recieved Time LocalVivekTable for example tables are named with username in between
                 {
-                    String q="UPDATE Local"+username+"Chats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime=null AND Receiver='"+temp.sender+"'";
+                    String q="UPDATE Local"+username+"Chats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime = '2019-01-01 00:00:00' AND Receiver ='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -92,7 +93,7 @@ public class ClientReceiver implements Runnable
                 }
                 else if(temp.valid==2)// seen Time
                 {
-                    String q="UPDATE Local"+username+"Chats SET SeenTime = '"+temp.time+"' WHERE    SeenTime=null AND Receiver='"+temp.sender+"'";
+                    String q="UPDATE Local"+username+"Chats SET SeenTime = '"+temp.time+"' WHERE    SeenTime = '2019-01-01 00:00:00' AND Receiver='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -105,7 +106,24 @@ public class ClientReceiver implements Runnable
                     @Override
                     public void run() {
                         System.out.println("Received receiving time refreshing");
-                        controller.refresh();
+                        for(int i=0;i<controller.chats.size();i++)
+                        {
+                            //System.out.println(controller.chats.get(i).getTo());
+                            //System.out.println(temp.sender);
+                            //System.out.println(controller.chats.get(i).getFrom());
+                            //System.out.println(controller.chats.get(i).getReceivedTime());
+                            if((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getReceivedTime()==null)
+                            {
+                                System.out.println("changed the value");
+                                controller.chats.get(i).setReceivedTime(temp.time);// update received time in message object
+                            }
+                        }
+                        try {
+                            System.out.println("Updating Display");
+                            controller.display(temp.sender);// update in UI
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -115,6 +133,11 @@ public class ClientReceiver implements Runnable
             {
                 Errors temp=(Errors) obj;
                 System.out.println(temp.errormessage);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Some Error Occured");
+                alert.setHeaderText("Error");
+                alert.setContentText(temp.errormessage);
+                alert.show();
             }
         }
 
