@@ -53,9 +53,9 @@ public class Signupcontroller
                     "  `Sender` varchar(15) NOT NULL,\n" +
                     "  `Receiver` varchar(15) NOT NULL,\n" +
                     "  `Message` text NOT NULL,\n" +
-                    "  `SentTime` timestamp NULL DEFAULT NULL,\n" +
-                    "  `ReceivedTime` timestamp NULL DEFAULT NULL,\n" +
-                    "  `SeenTime` timestamp NULL DEFAULT NULL\n" +
+                    "  `SentTime` timestamp NULL DEFAULT '2019-01-01 00:00:00',\n" +
+                    "  `ReceivedTime` timestamp NULL DEFAULT '2019-01-01 00:00:00',\n" +
+                    "  `SeenTime` timestamp NULL DEFAULT '2019-01-01 00:00:00'\n" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=latin1;";
             PreparedStatement ps=connection.prepareStatement(q);
             ps.execute();

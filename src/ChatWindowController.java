@@ -46,16 +46,47 @@ public class ChatWindowController
         Button name = new Button(username);
         AllChats.getChildren().add(name);//Add name of user to vbox
         name.setOnMouseClicked(e -> {
-            try {
-                display(username);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            seenMessagesof(username);
+
         });
+    }
+
+    public void seenMessagesof(String friend)
+    {
+        Timestamp seenTime=new Timestamp(System.currentTimeMillis());
+        String q="UPDATE Local"+username+"Chats SET SeenTime = '"+seenTime.toString()+"' WHERE SeenTime = '2019-01-01 00:00:00' AND Sender ='"+friend+"'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(q);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for(int i=0;i<chats.size();i++)
+        {
+            if(((chats.get(i).getTo().equals(friend)||chats.get(i).getFrom().equals(friend))&&chats.get(i).getSeenTime()==null))// check for proper object
+            {
+                System.out.println("changed the value");
+                chats.get(i).setSeenTime(seenTime);// update received time in message object
+            }
+        }
+        try {
+            display(friend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SystemMessage sm = new SystemMessage(friend,2,seenTime);
+        try {
+            oos.writeObject(sm);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
+
         currentUser.setText(username);
         VerticalPane.getChildren().clear();
         for(int i=0;i<chats.size();i++)
@@ -79,7 +110,13 @@ public class ChatWindowController
             ResultSet rs = ps.executeQuery();
             while(rs.next())
             {
-                chats.add(new Message(rs.getString("Sender"),rs.getString("Receiver"),rs.getString("Message"),rs.getTimestamp("SentTime"),rs.getTimestamp("ReceivedTime"),rs.getTimestamp("SeenTime")));
+                Timestamp rt=rs.getTimestamp("ReceivedTime");
+                Timestamp st=rs.getTimestamp("SeenTime");
+                if(rt==null||rs.getTimestamp("ReceivedTime").toString().equals("2019-01-01 00:00:00"))
+                    rt=null;
+                if(st==null||rs.getTimestamp("SeenTime").toString().equals("2019-01-01 00:00:00"))
+                    st=null;
+                chats.add(new Message(rs.getString("Sender"),rs.getString("Receiver"),rs.getString("Message"),rs.getTimestamp("SentTime"),rt,st));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -149,7 +186,7 @@ public class ChatWindowController
 
     public void insertIntoDatabase(Message temp)
     {
-        String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
+        String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"'2019-01-01 00:00:00'":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"'2019-01-01 00:00:00'":("'"+temp.getSeenTime()+"'"))+")";
         try {
             PreparedStatement ps = connection.prepareStatement(q);
             ps.executeUpdate();
