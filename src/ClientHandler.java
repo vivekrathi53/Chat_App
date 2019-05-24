@@ -73,74 +73,63 @@ public class ClientHandler implements Runnable,Serializable
             user temp = (user) obj;
             username = temp.username;
             password = temp.password;
-            try
-            {
-                if (authenticate())
-                {
-                    msh.oos=oos;
+            try {
+                if (authenticate()) {
+                    msh.oos = oos;
                     msh.remove(username);
                     System.out.println("Fine");
-                    while (true)
-                    {
+                    while (true) {
                         try {
                             obj = ois.readObject();
-                        }catch (ConnectionResetException e)
-                        {
+                        } catch (ConnectionResetException e) {
                             e.printStackTrace();
                             break;
                         }
-                        if(obj instanceof Message)
-                        {
+                        if (obj instanceof Message) {
                             Message ms = (Message) obj;
                             String receiver = ms.getTo();
-                            System.out.println("----------------"+receiver);
-                            ObjectOutputStream oosTo=find(receiver);
+                            System.out.println("----------------" + receiver);
+                            ObjectOutputStream oosTo = find(receiver);
                             System.out.println(oosTo);
-                            if (oosTo!=null)// IF USER IS ONLINE
+                            if (oosTo != null)// IF USER IS ONLINE
                             {
                                 System.out.println("User is Active");
                                 ms.setReceivedTime(ms.getSentTime());
                                 oosTo.writeObject(ms);
                                 oosTo.flush();
-                                SystemMessage sm = new SystemMessage(ms.getTo(),1,ms.getSentTime());
+                                SystemMessage sm = new SystemMessage(ms.getTo(), 1, ms.getSentTime());
                                 oos.writeObject(sm);
                                 oos.flush();
-                            }
-                            else// IF USER IS OFFLINE
+                            } else// IF USER IS OFFLINE
                             {
-                                msh.insert(receiver,ms);
+                                msh.insert(receiver, ms);
                             }
-                        }
-                        else if(obj instanceof SystemMessage)
-                        {
+                        } else if (obj instanceof SystemMessage) {
                             SystemMessage sm = (SystemMessage) obj;
                             String receiver = sm.sender;
-                            System.out.println("----------------"+receiver);
-                            ObjectOutputStream oosTo=find(receiver);
+                            System.out.println("----------------" + receiver);
+                            ObjectOutputStream oosTo = find(receiver);
                             System.out.println(oosTo);
-                            if (oosTo!=null)// IF USER IS ONLINE
+                            if (oosTo != null)// IF USER IS ONLINE
                             {
                                 System.out.println("User is Active");
-                                sm.sender=username;//for person who receives seen receipt will have sender as person who sends this to him
+                                sm.sender = username;//for person who receives seen receipt will have sender as person who sends this to him
                                 oosTo.writeObject(sm);
                                 oosTo.flush();
-                            }
-                            else// IF USER IS OFFLINE
+                            } else// IF USER IS OFFLINE
                             {
-                                sm.sender=username;//for person who receives seen receipt will have sender as person who sends this to him
-                                msh.insert(receiver,sm);
+                                sm.sender = username;//for person who receives seen receipt will have sender as person who sends this to him
+                                msh.insert(receiver, sm);
                             }
 
                         }
+                        else if(obj instanceof Logout){
+                            break;
+                        }
                     }
-                    ois.close();
-                    oos.close();
-                    Logout();// logout user if socket is closed
+                    Logout log=(Logout) obj;
+                    log.getSocket().close();//NEED SOME DISCUSSION
                     return;
-                }
-                else
-                {
-                    // Invalid authentication message already sent in Authenticate function itself
                 }
             }
             catch (ClassNotFoundException e) {

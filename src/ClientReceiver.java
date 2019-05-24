@@ -21,14 +21,8 @@ public class ClientReceiver implements Runnable
         while(true)
         {
             Object obj=null;
-            try
-            {
+            try {
                 obj = ois.readObject();
-            }
-            catch (ConnectionResetException e)
-            {
-                e.printStackTrace();
-                break;
             }
             catch (Exception e)
             {

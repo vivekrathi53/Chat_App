@@ -21,6 +21,8 @@ public class ChatWindowController
     @FXML
     Button Send;
     @FXML
+    Button Logout;
+    @FXML
     Button AddFriend;
     @FXML
     TextArea textBox;
@@ -31,7 +33,7 @@ public class ChatWindowController
     @FXML
     VBox AllChats;
     @FXML
-    Label currentUser;
+    Label currentUser;//USER WE ARE COMMMUNICATING
     public Socket socket;
     public ObjectInputStream ois;
     public ObjectOutputStream oos;
@@ -47,7 +49,6 @@ public class ChatWindowController
         AllChats.getChildren().add(name);//Add name of user to vbox
         name.setOnMouseClicked(e -> {
             seenMessagesof(username);
-
         });
     }
 
@@ -86,7 +87,6 @@ public class ChatWindowController
 
     public void display(String username) throws IOException// Current Chats of user with username person displayed
     {
-
         currentUser.setText(username);
         VerticalPane.getChildren().clear();
         for(int i=0;i<chats.size();i++)
@@ -123,12 +123,26 @@ public class ChatWindowController
         }
     }
 
+    public void logout() throws IOException {
+        Timestamp time=new Timestamp(System.currentTimeMillis());
+        Logout log=new Logout(username,time,socket);
+        oos.writeObject(log);
+        oos.flush();
+    }
+
     public void refresh()
     {
         textBox.clear();
         VerticalPane.getChildren().clear();
         AllChats.getChildren().clear();
         Send.setOnMouseClicked(e -> sendMessage());
+        Logout.setOnMouseClicked(e -> {
+            try {
+                logout();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
         chats = new ArrayList<>();
         friends= new ArrayList<>();
         AddFriend.setOnMouseClicked(e-> addNewFriendChat());
