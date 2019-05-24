@@ -13,7 +13,6 @@ public class MessageManager
 {
     Server server;
     ObjectOutputStream oos;
-    ObjectOutputStream oos2;
     Connection connection;
 
     public MessageManager(Server ss) throws Exception
@@ -65,31 +64,20 @@ public class MessageManager
         preStat.setTimestamp(4, time);
         preStat.executeUpdate();
     }
-
-    public Socket find(String sender) {
-        int flag = 0;
-        Socket temp = null;
+    public ObjectOutputStream find(String sender)
+    {
         int i=0;
-        for (Pair<String, Socket> value : server.activelist) {
-            String check = value.getKey();
-            if (check == sender)
-            {
-                temp = value.getValue();
-                flag = 1;
-                break;
-            }
-            //System.out.print(value);
-            i++;
-        }
-        System.out.println(temp);
-        if(i<server.activeUserStreams.size())
+        for(i=0;i<server.activelist.size();i++)
         {
-            oos2=server.activeUserStreams.get(i).getValue();
+            if (server.activelist.get(i).getKey().equals(sender))
+            {
+                return server.activeUserStreams.get(i).getValue();
+            }
         }
-        return temp;
+        return null;
     }
 
-    public void remove(Socket user,String username) throws SQLException, IOException, ClassNotFoundException {
+    public void remove(String username) throws SQLException, IOException, ClassNotFoundException {
         String table = username + "Table";
         String query = "SELECT * FROM " + (table) + "";
         PreparedStatement preStat = connection.prepareStatement(query);
@@ -112,19 +100,19 @@ public class MessageManager
             }
             else
             {
-                Socket receiver = find(sender);
-                Message ms=new Message(username,sender,content,time,null,null);
+                ObjectOutputStream oosTo = find(sender);
+                Message ms=new Message(sender,username,content,time,null,null);
                 oos.writeObject(ms);//Sent message to User
                 oos.flush();
                 LocalDateTime datetime1 = LocalDateTime.now();//To get Local time
                 time= Timestamp.valueOf(datetime1);
                 //System.out.println(datetime1);
-                if (receiver != null)// if Sender is online
+                if (oosTo != null)// if Sender is online
                 {
                     System.out.println("User is Active");
                     SystemMessage sm=new SystemMessage(username ,1,time );
-                    oos2.writeObject(sm);//Sender get Info of receiving time
-                    oos2.flush();
+                    oosTo.writeObject(sm);//Sender get Info of receiving time
+                    oosTo.flush();
                 }
                 else//if sender is offline
                 {

@@ -60,7 +60,7 @@ public class ChatWindowController
         VerticalPane.getChildren().clear();
         for(int i=0;i<chats.size();i++)
         {
-            if(chats.get(i).getFrom().equals(username))
+            if(chats.get(i).getFrom().equals(username)||chats.get(i).getTo().equals(username))
             {
                 addMessageToDisplay(chats.get(i));
             }
@@ -87,39 +87,28 @@ public class ChatWindowController
 
     public void refresh()
     {
+        VerticalPane.getChildren().clear();
+        AllChats.getChildren().clear();
         Send.setOnMouseClicked(e -> sendMessage());
         chats = new ArrayList<>();
         friends= new ArrayList<>();
         AddFriend.setOnMouseClicked(e-> addNewFriendChat());
-        Set<String> hash_Set = new HashSet<String>();
         fetchAllChats();//To fetch all chat of user from Local_Database
         for(int i=0;i<chats.size();i++)
         {
             try
             {
-                if(chats.get(i).getFrom().equals(currentUser))
+                if(chats.get(i).getFrom().equals(currentUser.getText())||chats.get(i).getTo().equals(currentUser.getText()))
                     addMessageToDisplay(chats.get(i));
-                hash_Set.add(chats.get(i).getFrom());
+                if((!friends.contains(chats.get(i).getFrom()))&&(!chats.get(i).getFrom().equals(username)))
+                {
+                    friends.add(chats.get(i).getFrom());
+                    addChat(chats.get(i).getFrom());
+                }
             }
             catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        Iterator<String> i = hash_Set.iterator();
-        while (i.hasNext())
-        {
-            String s=i.next();
-            System.out.println(s);
-            friends.add(s);
-            Label person = new Label(s);
-            AllChats.getChildren().add(person);
-            person.setOnMouseClicked(e -> {
-                try {
-                    display(person.getText());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            });
         }
     }
 
@@ -143,7 +132,8 @@ public class ChatWindowController
             System.out.println(msg.getContent());
             oos.writeObject(msg);
             oos.flush();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
         chats.add(msg);

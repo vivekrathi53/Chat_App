@@ -13,7 +13,6 @@ public class ClientHandler implements Runnable,Serializable
     Socket sc;
     Server server;
     ObjectOutputStream oos;
-    ObjectOutputStream oos2;
     ObjectInputStream ois;
     MessageManager msh;
     String username, password;
@@ -41,6 +40,18 @@ public class ClientHandler implements Runnable,Serializable
         }
         return null;
     }
+    public void Logout()
+    {
+        for(int i=0;i<server.activelist.size();i++)
+        {
+            if(server.activelist.get(i).getKey().equals(username))
+            {
+                server.activelist.remove(i);
+                server.activeUserStreams.remove(i);
+                return;
+            }
+        }
+    }
 
     public void run()
     {
@@ -67,7 +78,7 @@ public class ClientHandler implements Runnable,Serializable
                 if (authenticate())
                 {
                     msh.oos=oos;
-                    msh.remove(sc,username);
+                    msh.remove(username);
                     System.out.println("Fine");
                     while (true)
                     {
@@ -100,6 +111,8 @@ public class ClientHandler implements Runnable,Serializable
                     }
                     ois.close();
                     oos.close();
+                    Logout();// logout user if socket is closed
+                    return;
                 }
                 else
                 {
