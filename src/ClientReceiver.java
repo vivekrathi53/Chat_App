@@ -38,6 +38,7 @@ public class ClientReceiver implements Runnable
             if(obj instanceof Message)
             {
                 Message temp = (Message)obj;
+               temp.setReceivedTime(new Timestamp(System.currentTimeMillis()));//Receiver time is current time
                 String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"'2019-01-01 00:00:00'":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"'2019-01-01 00:00:00'":("'"+temp.getSeenTime()+"'"))+")";
                 try {
                     PreparedStatement ps = connection.prepareStatement(q);

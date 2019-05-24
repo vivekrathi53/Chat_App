@@ -43,7 +43,7 @@ public class ChatWindowController
 
     public void addChat(String username)
     {
-        Label name = new Label(username);
+        Button name = new Button(username);
         AllChats.getChildren().add(name);//Add name of user to vbox
         name.setOnMouseClicked(e -> {
             seenMessagesof(username);
@@ -98,6 +98,7 @@ public class ChatWindowController
         }
         currentUser.setText(username);
     }
+
     public void fetchAllChats()// Fetch All chats of user from local database
     {
         if(chats!=null)
@@ -124,6 +125,7 @@ public class ChatWindowController
 
     public void refresh()
     {
+        textBox.clear();
         VerticalPane.getChildren().clear();
         AllChats.getChildren().clear();
         Send.setOnMouseClicked(e -> sendMessage());
@@ -205,7 +207,7 @@ public class ChatWindowController
         VerticalPane.getChildren().add(vbox);
     }
 
-    private void showDetails(Message mesg)
+    private void showDetails(Message mesg)//To tell Receive time and Seen time
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Time Receipts");

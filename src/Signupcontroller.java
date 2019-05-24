@@ -32,9 +32,9 @@ public class Signupcontroller
     private Socket socket;
     LoginWindow lw;
     Stage window;
-
-    public void Sign() throws IOException
+    public void Sign() throws Exception
     {
+        Stage window = (Stage) password.getScene().getWindow();
         socket = new Socket(ServerIP.getText(), Integer.parseInt(PortNo.getText()));
         System.out.println("Connected to server");
         Signupclass data = new Signupclass(username.getText(),password.getText());
@@ -60,12 +60,6 @@ public class Signupcontroller
             PreparedStatement ps=connection.prepareStatement(q);
             ps.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        try {
-            lw=new LoginWindow();
-            lw.start(window);
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }
