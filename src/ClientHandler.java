@@ -13,7 +13,6 @@ public class ClientHandler implements Runnable,Serializable
     Socket sc;
     Server server;
     ObjectOutputStream oos;
-    ObjectOutputStream oos2;
     ObjectInputStream ois;
     MessageManager msh;
     String username, password;
@@ -29,27 +28,29 @@ public class ClientHandler implements Runnable,Serializable
         this.connection=connection;
     }
 
-    public Socket find(String sender) {
-        int flag = 0;
-        Socket temp = null;
+    public ObjectOutputStream find(String sender)
+    {
         int i=0;
-        for (Pair<String, Socket> value : server.activelist) {
-            String check = value.getKey();
-            if (check == sender)
-            {
-                temp = value.getValue();
-                flag = 1;
-                break;
-            }
-            //System.out.print(value);
-            i++;
-        }
-        System.out.println(temp);
-        if(i<server.activeUserStreams.size())
+        for(i=0;i<server.activelist.size();i++)
         {
-            oos2=server.activeUserStreams.get(i).getValue();
+            if (server.activelist.get(i).getKey().equals(sender))
+            {
+                return server.activeUserStreams.get(i).getValue();
+            }
         }
-        return temp;
+        return null;
+    }
+    public void Logout()
+    {
+        for(int i=0;i<server.activelist.size();i++)
+        {
+            if(server.activelist.get(i).getKey().equals(username))
+            {
+                server.activelist.remove(i);
+                server.activeUserStreams.remove(i);
+                return;
+            }
+        }
     }
 
     public void run()
@@ -74,35 +75,48 @@ public class ClientHandler implements Runnable,Serializable
             password = temp.password;
             try
             {
-                if (authenticate()) {
-                    msh.oos = oos;
-                    msh.remove(sc, username);
+                if (authenticate())
+                {
+                    msh.oos=oos;
+                    msh.remove(username);
                     System.out.println("Fine");
-                    while (true) {
+                    while (true)
+                    {
                         try {
                             obj = ois.readObject();
-                        } catch (ConnectionResetException e) {
+                        }catch (ConnectionResetException e)
+                        {
                             e.printStackTrace();
                             break;
                         }
                         Message ms = (Message) obj;
                         String receirver = ms.getTo();
-                        System.out.println("----------------" + receirver);
-                        Socket receiver = find(receirver);
-                        if (receiver != null)// IF USER IS ONLINE
+                        System.out.println("----------------"+receirver);
+                        ObjectOutputStream oosTo=find(receirver);
+                        System.out.println(oosTo);
+                        if (oosTo!=null)// IF USER IS ONLINE
                         {
                             System.out.println("User is Active");
                             ms.setReceivedTime(ms.getSentTime());
-                            ms.setSeenTime(ms.getSentTime());
-                            oos2.writeObject(ms);
-                            oos2.flush();
-                        } else// IF USER IS OFFLINE
+                            oosTo.writeObject(ms);
+                            oosTo.flush();
+                            SystemMessage sm = new SystemMessage(ms.getTo(),1,ms.getSentTime());
+                            oos.writeObject(sm);
+                            oos.flush();
+                        }
+                        else// IF USER IS OFFLINE
                         {
-                            msh.insert(receirver, ms);
+                            msh.insert(receirver,ms);
                         }
                     }
                     ois.close();
                     oos.close();
+                    Logout();// logout user if socket is closed
+                    return;
+                }
+                else
+                {
+                    // Invalid authentication message already sent in Authenticate function itself
                 }
             }
             catch (ClassNotFoundException e) {
@@ -127,7 +141,6 @@ public class ClientHandler implements Runnable,Serializable
 
     public boolean authenticate() throws ClassNotFoundException, SQLException //To authentication
     {
-        System.out.println("HJBJHBJH");
         String query = "SELECT Password FROM UserTable WHERE UserName='" + (username) + "'";
         PreparedStatement preStat = connection.prepareStatement(query);
         ResultSet rs = preStat.executeQuery(query);
@@ -143,6 +156,8 @@ public class ClientHandler implements Runnable,Serializable
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                server.activelist.add(new Pair<String,Socket>(username,sc));
+                server.activeUserStreams.add(new Pair<>(ois,oos));
                 return true;
             }
             else

@@ -3,7 +3,6 @@ import sun.net.ConnectionResetException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,7 +12,7 @@ public class ClientReceiver implements Runnable
     public ChatWindowController controller;
     Connection connection;
     ObjectInputStream ois;
-
+    String username;
     @Override
     public void run()
     {
@@ -37,29 +36,52 @@ public class ClientReceiver implements Runnable
             if(obj instanceof Message)
             {
                 Message temp = (Message)obj;
-                String q="INSERT INTO LocalChats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
+                String q="INSERT INTO Local"+username+"Chats VALUES('"+(temp.getFrom())+"','"+(temp.getTo())+"','"+(temp.getContent())+"',"+(temp.getSentTime()==null?"null":("'"+temp.getSentTime()+"'"))+","+(temp.getReceivedTime()==null?"null":("'"+temp.getReceivedTime()+"'"))+","+(temp.getSeenTime()==null?"null":("'"+temp.getSeenTime()+"'"))+")";
                 try {
                     PreparedStatement ps = connection.prepareStatement(q);
                     ps.executeUpdate();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                if(temp.getFrom().equals(controller.currentUser))
+                if(temp.getFrom().equals(controller.currentUser.getText()))
                 {
-                    try {
-                        controller.addMessageToDisplay(temp);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
+                        Platform.runLater(new Runnable()//To perform UI work from different Thread
+                        {
+                            @Override
+                            public void run() {
+                                System.out.println("Changing UI");
+                                try{controller.addMessageToDisplay(temp);}
+                                catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+
                 }
+
                 controller.chats.add(temp);
+                if(!controller.friends.contains(temp.getFrom()))
+                {
+                    Platform.runLater(new Runnable()//To perform UI work from different Thread
+                    {
+                        @Override
+                        public void run() {
+                            System.out.println(temp.getFrom());
+                            controller.addChat(temp.getFrom());
+                        }
+                    });
+
+                }
+
             }
             else if(obj instanceof SystemMessage)
             {
                 SystemMessage temp = (SystemMessage) obj;
-                if(temp.valid==1)// recieved Time
+                if(temp.valid==1)// recieved Time LocalVivekTable for example tables are named with username in between
                 {
-                    String q="UPDATE LocalChats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime=null AND Receiver='"+temp.sender+"'";
+                    String q="UPDATE Local"+username+"Chats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime=null AND Receiver='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -70,7 +92,7 @@ public class ClientReceiver implements Runnable
                 }
                 else if(temp.valid==2)// seen Time
                 {
-                    String q="UPDATE LocalChats SET SeenTime = '"+temp.time+"' WHERE    SeenTime=null AND Receiver='"+temp.sender+"'";
+                    String q="UPDATE Local"+username+"Chats SET SeenTime = '"+temp.time+"' WHERE    SeenTime=null AND Receiver='"+temp.sender+"'";
                     try {
                         PreparedStatement ps = connection.prepareStatement(q);
                         ps.executeUpdate();
@@ -82,6 +104,7 @@ public class ClientReceiver implements Runnable
                 {
                     @Override
                     public void run() {
+                        System.out.println("Received receiving time refreshing");
                         controller.refresh();
                     }
                 });

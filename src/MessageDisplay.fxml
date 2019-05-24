@@ -17,7 +17,7 @@
       <HBox fx:id="DetailsBox">
          <children>
             <Label fx:id="TimeContent" text="Time" />
-            <Label fx:id="ReadReceipts" text="Receipts" />
+            <Button fx:id="ReadReceipts" text="Details" />
          </children>
       </HBox>
    </children>

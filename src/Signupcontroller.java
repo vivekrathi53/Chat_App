@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class Signupcontroller
 {
@@ -27,7 +31,7 @@ public class Signupcontroller
     TextField PortNo;
     private Socket socket;
     LoginWindow lw;
-
+    Stage window;
     public void Sign() throws Exception
     {
         Stage window = (Stage) password.getScene().getWindow();
@@ -37,7 +41,26 @@ public class Signupcontroller
         ObjectOutputStream oos=new ObjectOutputStream(socket.getOutputStream());
         oos.writeObject(data);
         oos.flush();
-        lw=new LoginWindow();
-        lw.start(window);
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String url = "jdbc:mysql://127.0.0.1:3306/Chat_App";
+        try {
+            Connection connection = DriverManager.getConnection(url, "root", "password");
+            String q="CREATE TABLE `Local"+username.getText()+"Chats` (\n" +
+                    "  `Sender` varchar(15) NOT NULL,\n" +
+                    "  `Receiver` varchar(15) NOT NULL,\n" +
+                    "  `Message` text NOT NULL,\n" +
+                    "  `SentTime` timestamp NULL DEFAULT NULL,\n" +
+                    "  `ReceivedTime` timestamp NULL DEFAULT NULL,\n" +
+                    "  `SeenTime` timestamp NULL DEFAULT NULL\n" +
+                    ") ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+            PreparedStatement ps=connection.prepareStatement(q);
+            ps.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -23,7 +23,7 @@ public class Server
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String url = "jdbc:mysql://192.168.0.100/Chat_App";
+        String url = "jdbc:mysql://127.0.0.1:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url,"root","password");
         Server server=new Server();
         server.activelist=new ArrayList<Pair<String, Socket>>();
@@ -40,8 +40,6 @@ public class Server
                 ObjectInputStream ois = new ObjectInputStream(sc.getInputStream());
                 ClientHandler auth=new ClientHandler(sc,server,server.msh,oos,ois,connection);
                 Thread t=new Thread(auth);
-                server.activelist.add(new Pair<String, Socket>("", sc));
-                server.activeUserStreams.add(new Pair<>(ois,oos));
                 auth.oos=oos;
                 auth.ois=ois;
                 t.start();

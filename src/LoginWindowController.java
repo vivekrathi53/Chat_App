@@ -30,16 +30,17 @@ public class LoginWindowController
     @FXML
     Button userLogin;
     int type;
-
     public Stage window;
-    /*public void signUp()
+    public void signUp()
     {
         try {
-            sign();
-        } catch (IOException e) {
+            Signup signup = new Signup();
+            signup.start(window);
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
-    }*/
+    }
     public void Login() throws IOException
     {
         window = (Stage)name.getScene().getWindow();

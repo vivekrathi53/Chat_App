@@ -14,9 +14,10 @@ public class LoginWindow extends Application {
     public void start(Stage primaryStage) throws Exception
     {
         loader = new FXMLLoader(getClass().getResource("LoginWindowDesign.fxml"));
-        controller = loader.getController();
         MainDisplay  = loader.load();
+        controller = loader.getController();
         primaryStage.setScene(new Scene(MainDisplay));
+        controller.window=primaryStage;
         window = primaryStage;
         window.setTitle("Log in Page");
         window.show();
