@@ -23,6 +23,8 @@ public class ChatWindowController
     @FXML
     Button Logout;
     @FXML
+    Button refresh;
+    @FXML
     Button AddFriend;
     @FXML
     TextArea textBox;
@@ -124,10 +126,14 @@ public class ChatWindowController
     }
 
     public void logout() throws IOException {
+
         Timestamp time=new Timestamp(System.currentTimeMillis());
-        Logout log=new Logout(username,time,socket);
+        SystemMessage log=new SystemMessage(username,-1,time);
         oos.writeObject(log);
         oos.flush();
+       // ois.close();
+      //  oos.close();
+       // socket.close();
     }
 
     public void refresh()
@@ -136,6 +142,9 @@ public class ChatWindowController
         VerticalPane.getChildren().clear();
         AllChats.getChildren().clear();
         Send.setOnMouseClicked(e -> sendMessage());
+        refresh.setOnMouseClicked(e -> {
+                refresh();
+        });
         Logout.setOnMouseClicked(e -> {
             try {
                 logout();
@@ -181,6 +190,7 @@ public class ChatWindowController
     public void sendMessage()
     {
         Message msg = new Message(username,currentUser.getText(),textBox.getText(),new Timestamp(System.currentTimeMillis()),null,null);
+        textBox.clear();
         try {
             System.out.println(msg.getContent());
             oos.writeObject(msg);

@@ -56,7 +56,7 @@ public class Chat_App_Window extends Application {
             e.printStackTrace();
         }
         reciever = new ClientReceiver();
-        reciever.ois=ois;
+        reciever.ois=ois;//inputstream of client
         reciever.controller=controller;
         reciever.connection=connection;
         reciever.username=username;

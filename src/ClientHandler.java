@@ -18,6 +18,7 @@ public class ClientHandler implements Runnable,Serializable
     String username, password;
     Connection connection;
 
+
     public ClientHandler(Socket so, Server ss, MessageManager ms,ObjectOutputStream oos,ObjectInputStream ois,Connection connection)
     {
         sc = so;
@@ -40,21 +41,27 @@ public class ClientHandler implements Runnable,Serializable
         }
         return null;
     }
-    public void Logout()
+
+    public void logout(Timestamp time)
     {
         for(int i=0;i<server.activelist.size();i++)
         {
             if(server.activelist.get(i).getKey().equals(username))
             {
-                server.activelist.remove(i);
+                server.activelist.remove(i);//To remove user from current list
                 server.activeUserStreams.remove(i);
-                return;
+                break;
             }
+        }
+        for(int i=0;i<server.activeUserStreams.size();i++)
+        {
+            server.activeUserStreams.remove(i);
         }
     }
 
     public void run()
     {
+        Timestamp time = null;
         Object obj = null;
         try
         {
@@ -76,7 +83,7 @@ public class ClientHandler implements Runnable,Serializable
             try {
                 if (authenticate()) {
                     msh.oos = oos;
-                    msh.remove(username);
+                    msh.remove(username);//To empty table of user
                     System.out.println("Fine");
                     while (true) {
                         try {
@@ -106,6 +113,10 @@ public class ClientHandler implements Runnable,Serializable
                             }
                         } else if (obj instanceof SystemMessage) {
                             SystemMessage sm = (SystemMessage) obj;
+                            if(sm.valid==-1) {// SystemMessage object containing information of logout
+                                time=sm.time;
+                                break;
+                            }
                             String receiver = sm.sender;
                             System.out.println("----------------" + receiver);
                             ObjectOutputStream oosTo = find(receiver);
@@ -123,20 +134,18 @@ public class ClientHandler implements Runnable,Serializable
                             }
 
                         }
-                        else if(obj instanceof Logout){
-                            break;
                         }
                     }
-                    Logout log=(Logout) obj;
-                    log.getSocket().close();//NEED SOME DISCUSSION
+                    logout(time);
+                    this.oos.close();
+                    this.ois.close();
+                    this.sc.close();
                     return;
-                }
-            }
-            catch (ClassNotFoundException e) {
+                } catch (IOException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
