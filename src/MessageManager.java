@@ -22,10 +22,11 @@ public class MessageManager
 
     public void insertuser(Signupclass sc) throws SQLException
     {
-        String query1 = "INSERT INTO UserTable  VALUES (?, ?)";
+        String query1 = "INSERT INTO UserTable  VALUES (?, ?, ?)";
         PreparedStatement preStat = connection.prepareStatement(query1);
         preStat.setString(1, sc.user);
         preStat.setString(2, sc.password);
+        preStat.setTimestamp(3,new Timestamp(System.currentTimeMillis()));
         preStat.executeUpdate();
         String table=sc.user+"Table";
         query1="CREATE TABLE " + (table) + " ( Sender varchar(11),Valid int(255),Message text(2000),Time timestamp)";

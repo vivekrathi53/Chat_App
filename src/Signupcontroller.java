@@ -62,5 +62,7 @@ public class Signupcontroller
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        LoginWindow lw = new LoginWindow();
+        lw.start(window);
     }
 }
