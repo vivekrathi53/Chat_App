@@ -56,7 +56,15 @@ public class ClientHandler implements Runnable,Serializable
         {
             server.handlers.get(i).broadcast(username,time,-2);
         }
+        String query = "UPDATE UserTable SET LastSeen = '"+time+"' WHERE UserName='" + (username) + "'";
+        try {
+            PreparedStatement preStat = connection.prepareStatement(query);
+            preStat.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
     public void broadcast(String user,Timestamp time,int valid)
     {
         SystemMessage sm = new SystemMessage(user,valid,time);
@@ -191,6 +199,19 @@ public class ClientHandler implements Runnable,Serializable
                 server.activelist.add(new Pair<String,Socket>(username,sc));
                 server.activeUserStreams.add(new Pair<>(ois,oos));
                 server.handlers.add(this);
+                String query2 = "SELECT * FROM UserTable ";
+                PreparedStatement ps = connection.prepareStatement(query2);
+                ResultSet rs2 = ps.executeQuery();
+                while(rs2.next())
+                {
+                    try {
+                        oos.writeObject(new SystemMessage(rs2.getString("Username"),-2,rs2.getTimestamp("LastSeen")));
+                        oos.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
                 for(int i=0;i<server.handlers.size();i++)
                 {
                     if(!server.handlers.get(i).equals(this))

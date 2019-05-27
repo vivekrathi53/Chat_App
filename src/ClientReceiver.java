@@ -80,6 +80,7 @@ public class ClientReceiver implements Runnable
             else if(obj instanceof SystemMessage)
             {
                 SystemMessage temp = (SystemMessage) obj;
+                System.out.println(temp.valid);
                 if(temp.valid==1)// recieved Time LocalVivekTable for example tables are named with username in between
                 {
                     String q="UPDATE Local"+username+"Chats SET ReceivedTime = '"+temp.time+"' WHERE ReceivedTime = '2019-01-01 00:00:00' AND Receiver ='"+temp.sender+"'";
@@ -103,27 +104,34 @@ public class ClientReceiver implements Runnable
                 }
                 else if(temp.valid==-2)// someone logged out
                 {
+                    int flag=0;
                     for(int i=0;i<controller.FriendStatus.size();i++)
                     {
                         if(controller.FriendStatus.get(i).getUser().equals(temp.sender))
                         {
+                            flag=1;
                             controller.FriendStatus.get(i).setValid(0);
                             controller.FriendStatus.get(i).setTime(temp.time);
                             break;
                         }
                     }
-                    if(controller.currentUser.equals(temp.sender))
+                    if(flag==0)
+                    {
+                        controller.FriendStatus.add(new Status(temp.sender,temp.time,0));
+                    }
+                    if(controller.currentUser.getText().equals(temp.sender))
                     {
                         Platform.runLater(new Runnable()//To perform UI work from different Thread
                         {
                             @Override
                             public void run() {
+                                System.out.println("Changing Status Of CurrentUSer");
                                 controller.currentUserStatus.setText("Last Seen "+temp.time.toString());
                             }
                         });
                     }
                 }
-                else if(temp.valid==-3)
+                else if(temp.valid==-3)// someone logged in
                 {
                     int flag=0;
                     for(int i=0;i<controller.FriendStatus.size();i++)
@@ -137,9 +145,9 @@ public class ClientReceiver implements Runnable
                     }
                     if(flag==0)
                     {
-                        controller.FriendStatus.add(new Status(temp.sender,temp.time,0));
+                        controller.FriendStatus.add(new Status(temp.sender,temp.time,1));
                     }
-                    if(controller.currentUser.equals(temp.sender))
+                    if(controller.currentUser.getText().equals(temp.sender))
                     {
                         Platform.runLater(new Runnable()//To perform UI work from different Thread
                         {
@@ -150,36 +158,39 @@ public class ClientReceiver implements Runnable
                         });
                     }
                 }
-                Platform.runLater(new Runnable()//To perform UI work from different Thread
+                else if(temp.valid==1||temp.valid==2)
                 {
-                    @Override
-                    public void run() {
-                        System.out.println("Received receiving time refreshing");
-                        for(int i=0;i<controller.chats.size();i++)
-                        {
-                            //System.out.println(controller.chats.get(i).getTo());
-                            //System.out.println(temp.sender);
-                            //System.out.println(controller.chats.get(i).getFrom());
-                            //System.out.println(controller.chats.get(i).getReceivedTime());
-                            if(temp.valid==1&&((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getReceivedTime()==null))// check for proper object
+                    Platform.runLater(new Runnable()//To perform UI work from different Thread
+                    {
+                        @Override
+                        public void run() {
+                            System.out.println("Received receiving time refreshing");
+                            for(int i=0;i<controller.chats.size();i++)
                             {
-                                System.out.println("changed the value");
-                                controller.chats.get(i).setReceivedTime(temp.time);// update received time in message object
+                                //System.out.println(controller.chats.get(i).getTo());
+                                //System.out.println(temp.sender);
+                                //System.out.println(controller.chats.get(i).getFrom());
+                                //System.out.println(controller.chats.get(i).getReceivedTime());
+                                if(temp.valid==1&&((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getReceivedTime()==null))// check for proper object
+                                {
+                                    System.out.println("changed the value");
+                                    controller.chats.get(i).setReceivedTime(temp.time);// update received time in message object
+                                }
+                                else if(temp.valid==2&&((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getSeenTime()==null))// check for proper object
+                                {
+                                    System.out.println("changed the value");
+                                    controller.chats.get(i).setSeenTime(temp.time);// update received time in message object
+                                }
                             }
-                            else if(temp.valid==2&&((controller.chats.get(i).getTo().equals(temp.sender)||controller.chats.get(i).getFrom().equals(temp.sender))&&controller.chats.get(i).getSeenTime()==null))// check for proper object
-                            {
-                                System.out.println("changed the value");
-                                controller.chats.get(i).setSeenTime(temp.time);// update received time in message object
+                            try {
+                                System.out.println("Updating Display");
+                                controller.display(temp.sender);// update in UI
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
-                        try {
-                            System.out.println("Updating Display");
-                            controller.display(temp.sender);// update in UI
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                    });
+                }
 
 
             }
