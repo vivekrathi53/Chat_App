@@ -18,6 +18,7 @@ public class ClientHandler implements Runnable,Serializable
     String username, password;
     Connection connection;
 
+
     public ClientHandler(Socket so, Server ss, MessageManager ms,ObjectOutputStream oos,ObjectInputStream ois,Connection connection)
     {
         sc = so;
@@ -40,21 +41,36 @@ public class ClientHandler implements Runnable,Serializable
         }
         return null;
     }
-    public void Logout()
+
+    public void logout(Timestamp time)
     {
-        for(int i=0;i<server.activelist.size();i++)
-        {
-            if(server.activelist.get(i).getKey().equals(username))
-            {
-                server.activelist.remove(i);
+        for(int i=0;i<server.activelist.size();i++) {
+            if (server.activelist.get(i).getKey().equals(username)) {
+                server.activelist.remove(i);//To remove user from current list
                 server.activeUserStreams.remove(i);
-                return;
+                server.handlers.remove(i);
+                break;
             }
+        }
+        for(int i=0;i<server.handlers.size();i++)
+        {
+            server.handlers.get(i).broadcast(username,time,-2);
+        }
+    }
+    public void broadcast(String user,Timestamp time,int valid)
+    {
+        SystemMessage sm = new SystemMessage(user,valid,time);
+        try {
+            oos.writeObject(sm);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public void run()
     {
+        Timestamp time = null;
         Object obj = null;
         try
         {
@@ -73,81 +89,73 @@ public class ClientHandler implements Runnable,Serializable
             user temp = (user) obj;
             username = temp.username;
             password = temp.password;
-            try
-            {
-                if (authenticate())
-                {
-                    msh.oos=oos;
-                    msh.remove(username);
+            try {
+                if (authenticate()) {
+                    msh.oos = oos;
+                    msh.remove(username);//To empty table of user
                     System.out.println("Fine");
-                    while (true)
-                    {
+                    while (true) {
                         try {
                             obj = ois.readObject();
-                        }catch (ConnectionResetException e)
-                        {
+                        } catch (ConnectionResetException e) {
                             e.printStackTrace();
                             break;
                         }
-                        if(obj instanceof Message)
-                        {
+                        if (obj instanceof Message) {
                             Message ms = (Message) obj;
                             String receiver = ms.getTo();
-                            System.out.println("----------------"+receiver);
-                            ObjectOutputStream oosTo=find(receiver);
+                            System.out.println("----------------" + receiver);
+                            ObjectOutputStream oosTo = find(receiver);
                             System.out.println(oosTo);
-                            if (oosTo!=null)// IF USER IS ONLINE
+                            if (oosTo != null)// IF USER IS ONLINE
                             {
                                 System.out.println("User is Active");
                                 ms.setReceivedTime(ms.getSentTime());
                                 oosTo.writeObject(ms);
                                 oosTo.flush();
-                                SystemMessage sm = new SystemMessage(ms.getTo(),1,ms.getSentTime());
+                                SystemMessage sm = new SystemMessage(ms.getTo(), 1, ms.getSentTime());
                                 oos.writeObject(sm);
                                 oos.flush();
-                            }
-                            else// IF USER IS OFFLINE
+                            } else// IF USER IS OFFLINE
                             {
-                                msh.insert(receiver,ms);
+                                msh.insert(receiver, ms);
                             }
-                        }
-                        else if(obj instanceof SystemMessage)
-                        {
+                        } else if (obj instanceof SystemMessage) {
                             SystemMessage sm = (SystemMessage) obj;
+                            if(sm.valid==-1) {// SystemMessage object containing information of logout
+                                time=sm.time;
+                                break;
+                            }
                             String receiver = sm.sender;
-                            System.out.println("----------------"+receiver);
-                            ObjectOutputStream oosTo=find(receiver);
+                            System.out.println("----------------" + receiver);
+                            ObjectOutputStream oosTo = find(receiver);
                             System.out.println(oosTo);
-                            if (oosTo!=null)// IF USER IS ONLINE
+                            if (oosTo != null)// IF USER IS ONLINE
                             {
                                 System.out.println("User is Active");
-                                sm.sender=username;//for person who receives seen receipt will have sender as person who sends this to him
+                                sm.sender = username;//for person who receives seen receipt will have sender as person who sends this to him
                                 oosTo.writeObject(sm);
                                 oosTo.flush();
-                            }
-                            else// IF USER IS OFFLINE
+                            } else// IF USER IS OFFLINE
                             {
-                                sm.sender=username;//for person who receives seen receipt will have sender as person who sends this to him
-                                msh.insert(receiver,sm);
+                                sm.sender = username;//for person who receives seen receipt will have sender as person who sends this to him
+                                msh.insert(receiver, sm);
                             }
 
                         }
+                        }
                     }
-                    ois.close();
-                    oos.close();
-                    Logout();// logout user if socket is closed
+                System.out.println("Logging Out");
+                    logout(time);
+                    this.oos.close();
+                    this.ois.close();
+                    this.sc.close();
                     return;
-                }
-                else
-                {
-                    // Invalid authentication message already sent in Authenticate function itself
-                }
-            }
-            catch (ClassNotFoundException e) {
+                } catch (IOException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -182,6 +190,29 @@ public class ClientHandler implements Runnable,Serializable
                 }
                 server.activelist.add(new Pair<String,Socket>(username,sc));
                 server.activeUserStreams.add(new Pair<>(ois,oos));
+                server.handlers.add(this);
+                for(int i=0;i<server.handlers.size();i++)
+                {
+                    if(!server.handlers.get(i).equals(this))
+                    {
+                        server.handlers.get(i).broadcast(username,null,-3);
+                    }
+                }
+                for(int i=0;i<server.activelist.size();i++)
+                {
+                    if(!server.activelist.get(i).getKey().equals(username))
+                    {
+                        try
+                        {
+                            oos.writeObject(new SystemMessage(server.activelist.get(i).getKey(),-3,null));
+                            oos.flush();
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 return true;
             }
             else

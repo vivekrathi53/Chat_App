@@ -21,14 +21,8 @@ public class ClientReceiver implements Runnable
         while(true)
         {
             Object obj=null;
-            try
-            {
+            try {
                 obj = ois.readObject();
-            }
-            catch (ConnectionResetException e)
-            {
-                e.printStackTrace();
-                break;
             }
             catch (Exception e)
             {
@@ -107,6 +101,55 @@ public class ClientReceiver implements Runnable
                         e.printStackTrace();
                     }
                 }
+                else if(temp.valid==-2)// someone logged out
+                {
+                    for(int i=0;i<controller.FriendStatus.size();i++)
+                    {
+                        if(controller.FriendStatus.get(i).getUser().equals(temp.sender))
+                        {
+                            controller.FriendStatus.get(i).setValid(0);
+                            controller.FriendStatus.get(i).setTime(temp.time);
+                            break;
+                        }
+                    }
+                    if(controller.currentUser.equals(temp.sender))
+                    {
+                        Platform.runLater(new Runnable()//To perform UI work from different Thread
+                        {
+                            @Override
+                            public void run() {
+                                controller.currentUserStatus.setText("Last Seen "+temp.time.toString());
+                            }
+                        });
+                    }
+                }
+                else if(temp.valid==-3)
+                {
+                    int flag=0;
+                    for(int i=0;i<controller.FriendStatus.size();i++)
+                    {
+                        if(controller.FriendStatus.get(i).getUser().equals(temp.sender))
+                        {
+                            flag=1;
+                            controller.FriendStatus.get(i).setValid(1);
+                            break;
+                        }
+                    }
+                    if(flag==0)
+                    {
+                        controller.FriendStatus.add(new Status(temp.sender,temp.time,0));
+                    }
+                    if(controller.currentUser.equals(temp.sender))
+                    {
+                        Platform.runLater(new Runnable()//To perform UI work from different Thread
+                        {
+                            @Override
+                            public void run() {
+                                controller.currentUserStatus.setText("Online");
+                            }
+                        });
+                    }
+                }
                 Platform.runLater(new Runnable()//To perform UI work from different Thread
                 {
                     @Override
@@ -153,7 +196,4 @@ public class ClientReceiver implements Runnable
         }
 
     }
-
-
-
 }

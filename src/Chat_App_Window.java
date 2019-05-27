@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Chat_App_Window extends Application {
 
@@ -56,7 +57,7 @@ public class Chat_App_Window extends Application {
             e.printStackTrace();
         }
         reciever = new ClientReceiver();
-        reciever.ois=ois;
+        reciever.ois=ois;//inputstream of client
         reciever.controller=controller;
         reciever.connection=connection;
         reciever.username=username;
@@ -68,7 +69,9 @@ public class Chat_App_Window extends Application {
         controller.currentStage = primaryStage;
         controller.connection=connection;
         controller.username=username;
+        controller.FriendStatus=new ArrayList<>();
         controller.refresh();
+        controller.WindowPane=DisplayPane;
         t.start();
         primaryStage.setTitle("Chat Window!");
         primaryStage.setScene(new Scene(DisplayPane));
@@ -76,6 +79,8 @@ public class Chat_App_Window extends Application {
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
         primaryStage.setWidth((primScreenBounds.getWidth()));
         primaryStage.setHeight((primScreenBounds.getHeight()));
+        DisplayPane.setPrefWidth((primScreenBounds.getWidth()));
+        DisplayPane.setPrefHeight((primScreenBounds.getHeight()));
         // display window now
         primaryStage.show();
     }

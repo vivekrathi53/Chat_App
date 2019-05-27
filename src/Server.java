@@ -15,6 +15,7 @@ public class Server
     public  ArrayList<Pair<String, Socket>> activelist;
     public ArrayList<Pair<ObjectInputStream, ObjectOutputStream>> activeUserStreams;
     public MessageManager msh;
+    public ArrayList<ClientHandler> handlers;
 
     public static void main(String[] args) throws Exception
     {
@@ -26,6 +27,7 @@ public class Server
         String url = "jdbc:mysql://127.0.0.1:3306/Chat_App";
         Connection connection = DriverManager.getConnection(url,"root","password");
         Server server=new Server();
+        server.handlers=new ArrayList<>();
         server.activelist=new ArrayList<Pair<String, Socket>>();
         server.activeUserStreams=new ArrayList<>();
         server.msh = new MessageManager(server);
@@ -40,6 +42,7 @@ public class Server
                 ObjectInputStream ois = new ObjectInputStream(sc.getInputStream());
                 ClientHandler auth=new ClientHandler(sc,server,server.msh,oos,ois,connection);
                 Thread t=new Thread(auth);
+
                 auth.oos=oos;
                 auth.ois=ois;
                 t.start();
