@@ -4,7 +4,7 @@
 * User To User messaging
 * Sent, Received and Read receipts
 * Last seen or Online user status
-* Temporary Database
+* Temporary Database similar to WhatsApp where chats gets deleted from server automatically when they have been received by user to which they are intended.
 
 #### To Start project follow these steps - 
 * Import given database file ```Chat_App.sql``` inside your computer MySql server.
